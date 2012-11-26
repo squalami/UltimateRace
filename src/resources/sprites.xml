@@ -1,0 +1,44 @@
+<spriteset>
+    <author>Fred Doan</author>
+    <name>sprites</name>
+    <type>image/png</type>
+    <width>720</width>
+    <height>500</height>
+    
+    <frameset>
+        <name>background</name>
+        <top>0</top>
+        <left>0</left>
+        <width>720</width>
+        <height>280</height>
+    </frameset>
+
+    <frameset>
+        <name>redCar</name>
+        <top>280</top>
+        <left>0</left>
+        <width>80</width>
+        <height>40</height>
+        <columns>3</columns>
+    </frameset>
+    
+    <frameset>
+        <name>greenCar</name>
+        <top>320</top>
+        <left>0</left>
+        <width>80</width>
+        <height>40</height>
+        <columns>3</columns>
+    </frameset>
+    
+    <frameset>
+        <name>trans</name>
+        <top>360</top>
+        <left>0</left>
+        <width>24</width>
+        <height>24</height>
+     </frameset>
+
+    
+    
+</spriteset>
