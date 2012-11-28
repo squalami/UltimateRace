@@ -12,6 +12,10 @@ public class RoadSegment implements Comparable<RoadSegment> {
 	
 	double x;       // curve
 	double roadCenter; // center x value for road segment bottom edge
+	double rumbleLeft;
+	double ruumbleRight;
+	double grassLeft;
+	double grassRight;
 	
 	double lowerY;  // world bottom y
 	double upperY;  // world upper y
@@ -20,8 +24,7 @@ public class RoadSegment implements Comparable<RoadSegment> {
 	
 	double lowerCamZ;
 	double upperCamZ;
-	
-	
+		
 	double lowerScreenX = 0;
 	double lowerScreenY = 0;
 	double lowerScreenW = 0;
@@ -29,8 +32,11 @@ public class RoadSegment implements Comparable<RoadSegment> {
 	double upperScreenY = 0;
 	double upperScreenW = 0;
 	
+	boolean curve = false;
+	Car.State state;;
 	
-	public RoadSegment() {	}
+	
+	public RoadSegment(Car.State s, boolean c) { state = s; curve = c; }
 	
 	public int compareTo(RoadSegment other) {
 		return Double.compare(index,other.index);

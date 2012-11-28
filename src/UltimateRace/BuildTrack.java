@@ -15,24 +15,31 @@ public class BuildTrack {
 	int curve;
 	int hill;
 	double carZ;
+	boolean isCurve = false;
+	Car car;
+	Car.State state;
 
 	public ArrayList<RoadSegment> segments = new ArrayList<RoadSegment>();
 	
-	public BuildTrack(double carZ) {
+	public BuildTrack(double carZ, Car c) {
 		
 		level = Game.level;
 		this.carZ = carZ;
-		buildTrack(level);
+		buildTrack();
+		car = c;
 	}
 	
-	public void buildTrack(int level) {
+	public void buildTrack() {
 		segments.clear();
 		curve = 3 * level;
 		hill  = 10 * level;
 		
 		straightSegments(70);
-		curveSegments(35,35,2);
-		hillSegments(35,35);
+		curveSegments(35,35,0);
+		curveSegments(35,-35,0);
+		hillSegments(135,35);
+		hillSegments(75,-35);
+		straightSegments(75);
 		curveSegments(25,-45,-2);
 		straightSegments(45);
 		rollingHills(45);
@@ -81,8 +88,12 @@ public class BuildTrack {
 		double sY = previousY();		
 		double eY = sY + y * segmentLength;
 		
+		if (y < 0) { state = Car.State.DOWN; }
+		else if (y > 0) { state = Car.State.UP; }
+		else state = Car.State.STRAIGHT;
+		
 		for (int i=0; i < eIn; i++) {			
-			s = new RoadSegment();
+			s = new RoadSegment(state,isCurve);
 			s.lowerY = previousY();
 			s.upperY = easeOut(sY,eY,(double)i/total);
 			s.x = easeIn(0,x,(double)i/eIn);
@@ -93,8 +104,12 @@ public class BuildTrack {
 			index++;
 		}
 		
+		if (x != 0) {
+			isCurve = true;
+		}
+		
 		for (int i=0; i < runLength; i++) {
-			s = new RoadSegment();
+			s = new RoadSegment(state,isCurve);
 			s.lowerY = previousY();
 			s.upperY = easeOut(sY,eY,((double)i+eIn)/total);
 			s.x = x;
@@ -105,8 +120,10 @@ public class BuildTrack {
 			index++;			
 		}
 		
+		isCurve = false;
+		
 		for (int i=0; i < eOut; i++) {
-			s = new RoadSegment();
+			s = new RoadSegment(state,isCurve);
 			s.lowerY = previousY();
 			s.upperY = easeOut(sY,eY,((double)i+eIn+runLength)/total);
 			s.x = easeOut(x,0,(double)i/eOut);

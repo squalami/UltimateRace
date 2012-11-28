@@ -13,8 +13,12 @@ import jig.engine.util.Vector2D;
 public class Car extends VanillaAARectangle {
 	
 	public enum State { STRAIGHT, UP, DOWN }
+	
 	double speed = 0;
 	Vector2D startPos;
+	RoadSegment curSegment;
+	int lap = 0;
+	long elapsedTime = 0;
 	
 	public State state = State.STRAIGHT;
 	

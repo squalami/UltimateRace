@@ -7,12 +7,12 @@ package UltimateRace;
 import java.util.logging.Level;
 import jig.engine.RenderingContext;
 import jig.engine.ResourceFactory;
+import jig.engine.audio.jsound.AudioStream;
 import jig.engine.hli.StaticScreenGame;
 import jig.engine.physics.AbstractBodyLayer;
 import jig.engine.physics.BodyLayer;
 import jig.engine.physics.vpe.VanillaPhysicsEngine;
 import jig.engine.util.Vector2D;
-
 import java.awt.event.KeyEvent;
 
 
@@ -34,6 +34,7 @@ public class Game extends StaticScreenGame {
 	static final String SPRITE_SHEET = "resources/sprites.png";
 	
 	VanillaPhysicsEngine physics;
+	AudioStream music;
 
 	Car car1;
 	Car car2;
@@ -65,6 +66,8 @@ public class Game extends StaticScreenGame {
 		super(WORLD_WIDTH, WORLD_HEIGHT, false);
 		
 		physics = new VanillaPhysicsEngine();		
+		music = new AudioStream("resources/"+"RhythmSphere3.mp3");
+		
 		ResourceFactory.getFactory().loadSheet(SPRITE_SHEET, XMLFILE);
 		
 		background = new Background(SPRITE_SHEET + "#background");
@@ -121,7 +124,7 @@ public class Game extends StaticScreenGame {
 		gameObjectLayers.add(car2Layer);
 		physics.manageViewableSet(car2Layer);
 		
-		hitRumbles = new CarHitRumbles(car1,rbLayer);
+		hitRumbles = new CarHitRumbles(car1,rumbles);
 		hitGrass = new CarHitGrass(car1,grassLayer);
 
 
@@ -133,6 +136,7 @@ public class Game extends StaticScreenGame {
 		car2Pos = car2.getPosition();
 		checkUserInput ();
 		CollisionHandlers(deltaMs);
+		//music.loop(0.05, 25);
 	}
 	
 	/**
@@ -153,7 +157,7 @@ public class Game extends StaticScreenGame {
 	public void CollisionHandlers(long deltaMs) {
 		checkCollisions.registerCollisionHandler(hitRumbles);
 		checkCollisions.registerCollisionHandler(hitGrass);
-		checkCollisions.applyLawsOfPhysics(deltaMs);
+		//checkCollisions.applyLawsOfPhysics(deltaMs);
 	}
 
 	public static void main(String[] args) {

@@ -1,25 +1,27 @@
 package UltimateRace;
 
-import jig.engine.physics.BodyLayer;
+
 import jig.engine.physics.vpe.CollisionHandler;
+
+
+import java.awt.Rectangle;
 
 public class CarHitRumbles implements CollisionHandler {
 	
 	Car car;
-	BodyLayer<Rumbles> rumble;
+	Rumbles rumble;
+	Rectangle carRectangle;
+	RoadSegment segment;
 	
-	public CarHitRumbles (Car c, BodyLayer<Rumbles> r) {
+	public CarHitRumbles (Car c, Rumbles r) {
 		car = c;
 		rumble = r;
+		
 	}
 
 	@Override
 	public void findAndReconcileCollisions() {
-		// TODO Auto-generated method stub
-		for (int i=0; i < rumble.size(); i++) {
-			
-		}
-		
+
 	}
 
 }

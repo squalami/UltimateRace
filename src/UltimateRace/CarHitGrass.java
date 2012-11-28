@@ -16,6 +16,9 @@ public class CarHitGrass implements CollisionHandler {
 	@Override
 	public void findAndReconcileCollisions() {
 		// TODO Auto-generated method stub
+		for(int i=0; i < grass.size(); i++) {
+			
+		}
 		
 	}
 
