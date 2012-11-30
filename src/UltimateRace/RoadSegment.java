@@ -5,7 +5,7 @@ package UltimateRace;
  * F.Doan
  */
 
-public class RoadSegment implements Comparable<RoadSegment> {
+public class RoadSegment implements Comparable<RoadSegment>, java.io.Serializable {
 	
 	int index;
 	long time;

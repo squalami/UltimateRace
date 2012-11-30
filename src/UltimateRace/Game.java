@@ -4,6 +4,7 @@ package UltimateRace;
  * 
  */
 
+import UltimateRace.Car.State;
 import java.util.logging.Level;
 import jig.engine.RenderingContext;
 import jig.engine.ResourceFactory;
@@ -14,6 +15,7 @@ import jig.engine.physics.BodyLayer;
 import jig.engine.physics.vpe.VanillaPhysicsEngine;
 import jig.engine.util.Vector2D;
 import java.awt.event.KeyEvent;
+import java.util.Scanner;
 
 
 
@@ -56,7 +58,11 @@ public class Game extends StaticScreenGame {
 	BodyLayer<Rumbles> rbLayer;
 	
 	BodyLayer<Background> backgroundLayer;
-	
+	NetworkC GameNet;
+                boolean isServ;
+                boolean isNet=true;
+                String IP;
+                RoadSegment carRoad;
 	CarHitRumbles hitRumbles;
 	CarHitGrass hitGrass;
 	
@@ -86,7 +92,31 @@ public class Game extends StaticScreenGame {
 		car2 = new Car(SPRITE_SHEET + "#greenCar",
 				new Vector2D((3*WORLD_WIDTH/4 - 90),WORLD_HEIGHT-45));
 		car2Pos = car2.getPosition();
-		
+		if(isNet){
+                    System.out.println("Please enter none for host or an ip for client: ");
+                    Scanner s=new Scanner(System.in);
+                    IP=s.nextLine();
+                    GameNet=new NetworkC(IP);
+                    if(IP.equalsIgnoreCase("none")){
+                        isServ=true;
+		raceTrack = new RaceTrack(SPRITE_SHEET + "#trans",gameframe,
+				car1,  // this to be modified in network mode
+				grass,
+				road,
+				rumbles
+				);
+                    }
+                    else{
+                        isServ=false;
+                        raceTrack = new RaceTrack(SPRITE_SHEET + "#trans",gameframe,
+				car2,  // this to be modified in network mode
+				grass,
+				road,
+				rumbles
+				);
+                    }
+                }
+                else
 		raceTrack = new RaceTrack(SPRITE_SHEET + "#trans",gameframe,
 				car1,  // this to be modified in network mode
 				grass,
@@ -132,6 +162,157 @@ public class Game extends StaticScreenGame {
 	
 	public void update(long deltaMs) {
 		super.update(deltaMs);
+                 carS p1;
+                carS p2;
+                int j;
+                int k;
+                int k2;
+                double calcX;
+                RoadSegment segOrg=new RoadSegment(State.STRAIGHT,false);
+                if(isNet){
+                    if(isServ){
+                        p1=GameNet.reciveData();
+                        p2=new carS();
+                        p2.p1=raceTrack.findSegment(raceTrack.curZpos+raceTrack.carZ);
+                        j=p2.p1.index;
+                        k=p1.p1.index+1;
+                        k2=p1.p1.index;
+                        p2.lap=car1.lap;
+                        p2.runTime=car1.elapsedTime;
+                        if(car1.state==State.DOWN){
+                            p2.state=1;
+                        }
+                        else if(car1.state==State.STRAIGHT){
+                            p2.state=2;
+                        }
+                        else
+                            p2.state=3;
+                        GameNet.sendData(p2);
+                        car2.setActivation(false);
+                       for(int i=0;i<raceTrack.drawDistance-30;i++){
+                            if(j==k2){
+                                segOrg=raceTrack.track.segments.get(j);
+                            
+                                //System.out.println(p1.p1.index+","+j);
+                                car2.setActivation(true);
+                                
+                                calcX=car2.startPos.getX()-p1.p1.lowerScreenX;
+                                //System.out.println(calcX);
+                                double pp=(segOrg.upperScreenX+segOrg.upperScreenW-segOrg.lowerScreenX+segOrg.lowerScreenW);
+                                double ppp=(p2.p1.upperScreenX+p2.p1.upperScreenW-p2.p1.lowerScreenX+p2.p1.lowerScreenW);
+                                calcX=calcX*(pp/ppp);
+                                car2.setPosition(new Vector2D(segOrg.lowerScreenX,car2.startPos.getY()));
+                                if(calcX<0)
+                                    car2.setCenterPosition(new Vector2D(segOrg.lowerScreenX-segOrg.lowerScreenW-calcX-car2.getWidth()/2,segOrg.lowerScreenY-car2.getHeight()));
+                                else
+                                   car2.setCenterPosition(new Vector2D(segOrg.lowerScreenX+calcX+car2.getWidth()/2,segOrg.lowerScreenY-car2.getHeight()));
+                                break;
+                            }
+                            else{
+                                j++;
+                                if(j>raceTrack.totalIndex){
+                                    j=0;
+                                }
+                            }
+                        }
+                        
+                        car2.curSegment=p1.p1;
+                                car2.elapsedTime=p1.runTime;
+                                car2.lap=p1.lap;
+                                if(p1.state==1){
+                                    car2.state=State.DOWN;
+                                }
+                                else if(p1.state==2){
+                                    car2.state=State.STRAIGHT;
+                                }
+                                else
+                                    car2.state=State.UP;
+                                car2.curSegment=segOrg;
+                                
+                        //carRoad.roadCenter=p1.p1.roadCenter;
+                       
+                       
+                    }
+                    else{
+
+                        p1=new carS();
+                        p1.p1=raceTrack.findSegment(raceTrack.curZpos+raceTrack.carZ);
+                        p1.lap=car2.lap;
+                        p1.runTime=car2.elapsedTime;
+                        if(car2.state==State.DOWN){
+                            p1.state=1;
+                        }
+                        else if(car2.state==State.STRAIGHT){
+                            p1.state=2;
+                        }
+                        else
+                            p1.state=3;
+                        GameNet.sendData(p1);
+                        p2=GameNet.reciveData();
+                        j=p1.p1.index;
+                        k=p2.p1.index+1;
+                        k2=p2.p1.index;
+                        
+                       for(int i=0;i<raceTrack.drawDistance-30;i++){
+                            if(j==k2){
+                                segOrg=raceTrack.track.segments.get(j);
+                                car1.setActivation(true);
+                                //RoadSegment g=raceTrack.track.segments.get(j);
+                                calcX=car1.startPos.getX()-p2.p1.lowerScreenX;
+                                
+                                double pp=(segOrg.upperScreenX+segOrg.upperScreenW-segOrg.lowerScreenX+segOrg.lowerScreenW);
+                                double ppp=(p2.p1.upperScreenX+p2.p1.upperScreenW-p2.p1.lowerScreenX+p2.p1.lowerScreenW);
+                                calcX=calcX*(pp/ppp);
+       
+                                if(calcX<0)
+                                    car1.setCenterPosition(new Vector2D(segOrg.lowerScreenX-segOrg.lowerScreenW-calcX-car1.getWidth()/2,segOrg.lowerScreenY-car1.getHeight()));
+                                else
+                                   car1.setCenterPosition(new Vector2D(segOrg.lowerScreenX+calcX+car1.getWidth()/2,segOrg.lowerScreenY-car1.getHeight()));
+                               
+                                break;
+                            }
+                            else{
+                                j++;
+                                if(j>raceTrack.totalIndex){
+                                    j=0;
+                                }
+                            }
+                        }
+                                car1.curSegment=p2.p1;
+                                car1.elapsedTime=p2.runTime;
+                                car1.lap=p2.lap;
+                                if(p2.state==1){
+                                    car1.state=State.DOWN;
+                                }
+                                else if(p2.state==2){
+                                    car1.state=State.STRAIGHT;
+                                }
+                                else
+                                    car1.state=State.UP;
+                     
+                    }
+                    if(car1.lap>car2.lap){
+                            car1.RacePos=1;
+                            car2.RacePos=2;
+                        }
+                        else if(car1.lap<car2.lap){
+                            car2.RacePos=1;
+                            car1.RacePos=2;
+                        }
+                        else{
+                            if(car1.curSegment.index>car2.curSegment.index){
+                                car1.RacePos=1;
+                                car2.RacePos=2;
+                            }
+                            else if(car1.curSegment.index<car2.curSegment.index){
+                                car2.RacePos=1;
+                                car1.RacePos=2;
+                            }
+                            else{
+                                
+                            }
+                        }
+                }
 		car1Pos = car1.getPosition();
 		car2Pos = car2.getPosition();
 		checkUserInput ();

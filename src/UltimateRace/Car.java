@@ -19,6 +19,7 @@ public class Car extends VanillaAARectangle {
 	RoadSegment curSegment;
 	int lap = 0;
 	long elapsedTime = 0;
+        int RacePos;
 	
 	public State state = State.STRAIGHT;
 	
