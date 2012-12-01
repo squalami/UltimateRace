@@ -70,8 +70,8 @@ public class Game extends StaticScreenGame {
 	
 	public Game() {
 		super(WORLD_WIDTH, WORLD_HEIGHT, false);
-		
-		physics = new VanillaPhysicsEngine();		
+                
+		physics = new VanillaPhysicsEngine();
 		music = new AudioStream("resources/"+"RhythmSphere3.mp3");
 		
 		ResourceFactory.getFactory().loadSheet(SPRITE_SHEET, XMLFILE);
@@ -167,11 +167,14 @@ public class Game extends StaticScreenGame {
                 int j;
                 int k;
                 int k2;
+               double car1Dist;
+               double car2Dist; 
                 double calcX;
                 RoadSegment segOrg=new RoadSegment(State.STRAIGHT,false);
                 if(isNet){
                     if(isServ){
                         p1=GameNet.reciveData();
+                        car2Dist=p1.carDist;
                         p2=new carS();
                         p2.p1=raceTrack.findSegment(raceTrack.curZpos+raceTrack.carZ);
                         j=p2.p1.index;
@@ -187,6 +190,8 @@ public class Game extends StaticScreenGame {
                         }
                         else
                             p2.state=3;
+                        p2.carDist=car1.getPosition().getY()-car1.curSegment.lowerScreenY;
+                        car1Dist=p2.carDist;
                         GameNet.sendData(p2);
                         car2.setActivation(false);
                        for(int i=0;i<raceTrack.drawDistance-30;i++){
@@ -234,7 +239,7 @@ public class Game extends StaticScreenGame {
                        
                     }
                     else{
-
+                        //send ovet all needed data
                         p1=new carS();
                         p1.p1=raceTrack.findSegment(raceTrack.curZpos+raceTrack.carZ);
                         p1.lap=car2.lap;
@@ -247,23 +252,34 @@ public class Game extends StaticScreenGame {
                         }
                         else
                             p1.state=3;
+                        p1.carDist=car2.getPosition().getY()-car2.curSegment.lowerScreenY;
+                        car2Dist=p1.carDist;
                         GameNet.sendData(p1);
                         p2=GameNet.reciveData();
+                        car1Dist=p2.carDist;
                         j=p1.p1.index;
                         k=p2.p1.index+1;
                         k2=p2.p1.index;
                         
+                        //go through all visable segments to find if car is on one
                        for(int i=0;i<raceTrack.drawDistance-30;i++){
                             if(j==k2){
+                                //segment indexes match, so we grab the segment
                                 segOrg=raceTrack.track.segments.get(j);
                                 car1.setActivation(true);
-                                //RoadSegment g=raceTrack.track.segments.get(j);
+                                
+                                //calculate the x distance travel on other cars screen
                                 calcX=car1.startPos.getX()-p2.p1.lowerScreenX;
                                 
+                                //get lenght of segment car will be put one
                                 double pp=(segOrg.upperScreenX+segOrg.upperScreenW-segOrg.lowerScreenX+segOrg.lowerScreenW);
+                                //get length of orginal segment
                                 double ppp=(p2.p1.upperScreenX+p2.p1.upperScreenW-p2.p1.lowerScreenX+p2.p1.lowerScreenW);
+                                
+                                //times x distance by ratio to get actual distance the car will travel on the new segment
                                 calcX=calcX*(pp/ppp);
        
+                                //if calcX< o car is to the left of x mid, else its to the right
                                 if(calcX<0)
                                     car1.setCenterPosition(new Vector2D(segOrg.lowerScreenX-segOrg.lowerScreenW-calcX-car1.getWidth()/2,segOrg.lowerScreenY-car1.getHeight()));
                                 else
@@ -278,6 +294,7 @@ public class Game extends StaticScreenGame {
                                 }
                             }
                         }
+                                //set car1 values what we got
                                 car1.curSegment=p2.p1;
                                 car1.elapsedTime=p2.runTime;
                                 car1.lap=p2.lap;
@@ -291,6 +308,7 @@ public class Game extends StaticScreenGame {
                                     car1.state=State.UP;
                      
                     }
+                    //finding postion use lap numbe first
                     if(car1.lap>car2.lap){
                             car1.RacePos=1;
                             car2.RacePos=2;
@@ -300,6 +318,7 @@ public class Game extends StaticScreenGame {
                             car1.RacePos=2;
                         }
                         else{
+                            //same lap use segment number
                             if(car1.curSegment.index>car2.curSegment.index){
                                 car1.RacePos=1;
                                 car2.RacePos=2;
@@ -309,7 +328,15 @@ public class Game extends StaticScreenGame {
                                 car1.RacePos=2;
                             }
                             else{
-                                
+                                //same segment, will use distance to end of segment in the y for position
+                                if(car1Dist<car2Dist){
+                                    car2.RacePos=1;
+                                    car1.RacePos=2;
+                                }
+                                else{
+                                    car1.RacePos=1;
+                                    car2.RacePos=2;
+                                }
                             }
                         }
                 }

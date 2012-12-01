@@ -25,6 +25,9 @@ class carS implements java.io.Serializable{
         int lap;
         long runTime;
         int state;
+        
+        //for postion calculations
+        double carDist;
         //map data stuff
         //////////////////
         //add data here//
