@@ -36,6 +36,25 @@ public class Car extends VanillaAARectangle {
 		updateFrames(deltaMs);
 				
 	}
+	
+	public void render(final RenderingContext rc) {
+		if (!active) {
+			return;
+		}
+
+		AffineTransform at = AffineTransform.getTranslateInstance(position
+				.getX(), position.getY());
+		/*
+		Manipulating the at with at.scale(x,y) will resize the sprite and i dont think we will have to worry about
+		keeping track of the resize variable because colision will only happen when it is resied to a certain range
+		around the size it is allocated at
+		*/
+		super.render(rc, at);
+
+		if (renderMarkup) {
+			imgBoundingRectangle.get(0).render(rc, at);
+		}
+	}
 
 	private void updateFrames(long deltaMs) {
 		
