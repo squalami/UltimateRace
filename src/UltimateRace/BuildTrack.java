@@ -37,7 +37,7 @@ public class BuildTrack {
 		straightSegments(45);
 		curveSegments(35,35,0);
 		curveSegments(35,-35,0);
-		hillSegments(135,35);
+		hillSegments(75,35);
 		hillSegments(75,-35);
 		straightSegments(75);
 		curveSegments(25,-45,-2);
@@ -45,10 +45,10 @@ public class BuildTrack {
 		rollingHills(45);
 		straightSegments(25);
 		Scurve(75);
-		straightSegments(45);
+		straightSegments(35);
 		hillSegments(35,35);
 		hillSegments(35,-35);
-		straightSegments(45);		
+		straightSegments(35);		
 				
 	}
 	
