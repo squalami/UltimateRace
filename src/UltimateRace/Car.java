@@ -6,6 +6,8 @@ package UltimateRace;
  * 
  */
 
+import java.awt.geom.AffineTransform;
+import jig.engine.RenderingContext;
 import jig.engine.physics.vpe.VanillaAARectangle;
 import jig.engine.util.Vector2D;
 
@@ -20,7 +22,13 @@ public class Car extends VanillaAARectangle {
 	int lap = 0;
 	long elapsedTime = 0;
         int RacePos;
-	
+        int currWidth;
+        int currHeight;
+        //for scaling 
+        double scalFactorW;
+        double scalFactorH;
+	double scal2W;
+        double scal2H;
 	public State state = State.STRAIGHT;
 	
 	public Car(String sprite, Vector2D pos) {
@@ -28,7 +36,13 @@ public class Car extends VanillaAARectangle {
 		// TODO Auto-generated constructor stub
 		position = pos;
 		startPos = pos;
-
+                scalFactorH=1;
+                scalFactorW=1;
+                scal2W=1;
+                scal2H=1;
+                currWidth=width;
+                currHeight=height;
+                
 	}
 
 	@Override
@@ -36,7 +50,7 @@ public class Car extends VanillaAARectangle {
 		updateFrames(deltaMs);
 				
 	}
-	
+        	
 	public void render(final RenderingContext rc) {
 		if (!active) {
 			return;
@@ -49,9 +63,14 @@ public class Car extends VanillaAARectangle {
 		keeping track of the resize variable because colision will only happen when it is resied to a certain range
 		around the size it is allocated at
 		*/
-		super.render(rc, at);
+                    //System.out.println("scaling with scal2H="+scal2H);
+                    at.scale(scal2H, scal2H);
+                    scalFactorW=scal2W;
+                    scalFactorH=scal2H;
+                    
+                super.render(rc, at);
 
-		if (renderMarkup) {
+		if(renderMarkup){
 			imgBoundingRectangle.get(0).render(rc, at);
 		}
 	}

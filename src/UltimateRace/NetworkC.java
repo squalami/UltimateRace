@@ -92,7 +92,8 @@ public class NetworkC {
                 } catch (IOException ex) {
                     //System.err.println(ex);
                     System.out.println("could not send data, connection issue");
-                    resetCon(isS);
+                    //resetCon(isS);
+                    System.exit(1);
                 }
     }
     //method to obtain data from a computer
@@ -105,7 +106,8 @@ public class NetworkC {
           //p=d.readLine()
         } catch (IOException ex) {
             System.out.println("network write issue, connection issue");
-            resetCon(isS);
+            //resetCon(isS);
+            System.exit(1);
         } catch (ClassNotFoundException ex) {
              System.out.println("network write issue");
             System.exit(1);
