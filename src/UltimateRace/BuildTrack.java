@@ -34,7 +34,7 @@ public class BuildTrack {
 		curve = 3 * level;
 		hill  = 10 * level;
 		
-		straightSegments(70);
+		straightSegments(45);
 		curveSegments(35,35,0);
 		curveSegments(35,-35,0);
 		hillSegments(135,35);

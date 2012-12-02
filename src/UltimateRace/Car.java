@@ -6,6 +6,9 @@ package UltimateRace;
  * 
  */
 
+import java.awt.geom.AffineTransform;
+
+import jig.engine.RenderingContext;
 import jig.engine.physics.vpe.VanillaAARectangle;
 import jig.engine.util.Vector2D;
 
@@ -17,9 +20,9 @@ public class Car extends VanillaAARectangle {
 	double speed = 0;
 	Vector2D startPos;
 	RoadSegment curSegment;
-	int lap = 0;
+	int lap = 1;
 	long elapsedTime = 0;
-        int RacePos;
+    int RacePos = 1;
 	
 	public State state = State.STRAIGHT;
 	
@@ -34,7 +37,9 @@ public class Car extends VanillaAARectangle {
 	@Override
 	public void update(long deltaMs) {
 		updateFrames(deltaMs);
-				
+		if (Game.gameIsRun) {
+			elapsedTime = (System.currentTimeMillis() - Game.iniTime)/1000;
+		}
 	}
 	
 	public void render(final RenderingContext rc) {

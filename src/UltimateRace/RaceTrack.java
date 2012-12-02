@@ -48,15 +48,14 @@ public class RaceTrack extends VanillaAARectangle {
 	double maxSpeed = 5; 
 	double curMaxSpeed = maxSpeed;
 	double offRoadDecel   = -maxSpeed/2;     
-	double currentLapTime = 0;               
-	double lastLapTime    = 0;  
-
 
 	BuildTrack track;
 	Vector2D carPos, carPrePos;
 	Car car;
 
 	long time = 0;
+	long currentLapTime = 0;    
+	
 	int curIndex = 0;
 	int totalIndex = 0;
 	int updateDelay = 0;
@@ -125,6 +124,7 @@ public class RaceTrack extends VanillaAARectangle {
 
 		if (curIndex + 2 > totalIndex) {
 			curZpos = 0;
+			car.lap++;
 		}
 
 		if (startTrack) {
@@ -227,7 +227,7 @@ public class RaceTrack extends VanillaAARectangle {
 
 		// hit rumble strips
 		if ((xL < curSegment.rumbleLeft && xR > curSegment.rumbleLeft - rumbleLength) || 
-				(xR > curSegment.ruumbleRight && xL < curSegment.ruumbleRight + rumbleLength)) {
+				(xR > curSegment.rumbleRight && xL < curSegment.rumbleRight + rumbleLength)) {
 			if (car.speed > 0) {
 				if (revup.getState() == AudioState.PLAYING) revup.pause();
 				if (full.getState() == AudioState.PLAYING) full.pause();
@@ -274,7 +274,7 @@ public class RaceTrack extends VanillaAARectangle {
 			}
 		}
 		
-		if (curSegment.curve) {
+		if (curSegment.curve && car.speed > 0.4) {
 			if (skid.getState() == AudioState.PAUSED)
 				skid.resume();
 			else
@@ -369,7 +369,7 @@ public class RaceTrack extends VanillaAARectangle {
 		segment.grassLeft = x2-w2-r2;
 		segment.grassRight = x2+w2+r2;
 		segment.rumbleLeft = x2-w2;
-		segment.ruumbleRight = x2+w2;
+		segment.rumbleRight = x2+w2;
 		Color rumbleColor;
 		Color grassColor;
 		Color roadColor = Color.gray;

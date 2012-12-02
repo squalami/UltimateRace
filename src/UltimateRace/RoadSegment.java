@@ -7,13 +7,17 @@ package UltimateRace;
 
 public class RoadSegment implements Comparable<RoadSegment>, java.io.Serializable {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	int index;
 	long time;
 	
 	double x;       // curve
 	double roadCenter; // center x value for road segment bottom edge
 	double rumbleLeft;
-	double ruumbleRight;
+	double rumbleRight;
 	double grassLeft;
 	double grassRight;
 	

@@ -20,7 +20,11 @@ class carS implements java.io.Serializable{
         //used mainly to denote the end of track
         //true means more tracks to come, false means last track
         
-        //this is for the car data
+        /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+		//this is for the car data
         RoadSegment p1;
         int lap;
         long runTime;
