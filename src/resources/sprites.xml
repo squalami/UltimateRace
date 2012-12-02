@@ -39,6 +39,15 @@
         <height>24</height>
      </frameset>
 
+     <frameset>
+        <name>boost</name>
+        <top>280</top>
+        <left>0</left>
+        <width>40</width>
+        <height>40</height>
+     </frameset>
+
+
     
     
 </spriteset>
