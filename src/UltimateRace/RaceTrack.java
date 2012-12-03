@@ -78,7 +78,7 @@ public class RaceTrack extends VanillaAARectangle {
 	AudioStream full;
 	AudioStream idle;
 	AudioStream revup;
-	AudioClip rsound;
+	static AudioStream rsound;
 	AudioStream skid;	
 
 	public RaceTrack(String sprite, GameFrame gameframe, Car car, Grass g, Road rd, Rumbles r) {
@@ -97,11 +97,11 @@ public class RaceTrack extends VanillaAARectangle {
 		road = rd.road;
 		curIndex = rd.curIndex;
 		crash = ResourceFactory.getFactory().getAudioClip("resources/" + "Crash.wav");
-		decel = new AudioStream("resources/" + "Desel.wav");
+		decel = new AudioStream("resources/" + "Decel.wav");
 		full = new AudioStream("resources/" + "FullIdle.wav");
 		idle = new AudioStream("resources/" + "idle.wav");
 		revup = new AudioStream("resources/" + "revup.wav");
-		rsound = ResourceFactory.getFactory().getAudioClip("resources/" + "Rumble.wav");
+		rsound = new AudioStream("resources/" + "Rumble.wav");
 		skid = new AudioStream("resources/" + "Skid.wav");
 
 	}
@@ -224,14 +224,15 @@ public class RaceTrack extends VanillaAARectangle {
 		// TODO Auto-generated method stub
 		double xL = carPos.getX();
 		double xR = xL + car.getWidth();
-
+		rsound.loop(0.4, 0 );
+		
 		// hit rumble strips
 		if ((xL < curSegment.rumbleLeft && xR > curSegment.rumbleLeft - rumbleLength) || 
 				(xR > curSegment.rumbleRight && xL < curSegment.rumbleRight + rumbleLength)) {
 			if (car.speed > 0) {
 				if (revup.getState() == AudioState.PLAYING) revup.pause();
 				if (full.getState() == AudioState.PLAYING) full.pause();
-				rsound.play(0.4);
+				rsound.resume();
 				double cY = carPos.getY();
 				if (cY == carPrePos.getY()) {
 					car.setPosition(new Vector2D(carPos.getX(),carPos.getY()-2));
@@ -250,6 +251,7 @@ public class RaceTrack extends VanillaAARectangle {
 
 		else if (xL < curSegment.grassLeft || xR > curSegment.grassRight) {
 			hitGrass = true;
+			rsound.pause();
 			if (car.speed > 0.15) {
 				if (full.getState() == AudioState.PLAYING)
 					full.pause();
@@ -262,6 +264,7 @@ public class RaceTrack extends VanillaAARectangle {
 			}
 		} else {
 			hitGrass = false;
+			rsound.pause();
 			//if (decel.getState() == AudioState.PLAYING) decel.pause();
 			if (car.speed < 0.0005) {
 				if (revup.getState() == AudioState.PLAYING)  revup.pause();
