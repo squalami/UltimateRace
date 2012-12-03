@@ -224,7 +224,7 @@ public class RaceTrack extends VanillaAARectangle {
 		// TODO Auto-generated method stub
 		double xL = carPos.getX();
 		double xR = xL + car.getWidth();
-		rsound.loop(0.4, 0 );
+		
 		
 		// hit rumble strips
 		if ((xL < curSegment.rumbleLeft && xR > curSegment.rumbleLeft - rumbleLength) || 
@@ -232,7 +232,10 @@ public class RaceTrack extends VanillaAARectangle {
 			if (car.speed > 0) {
 				if (revup.getState() == AudioState.PLAYING) revup.pause();
 				if (full.getState() == AudioState.PLAYING) full.pause();
-				rsound.resume();
+				if (rsound.getState() == AudioState.PAUSED)
+					rsound.resume();
+				else
+					rsound.loop(0.4, 0);
 				double cY = carPos.getY();
 				if (cY == carPrePos.getY()) {
 					car.setPosition(new Vector2D(carPos.getX(),carPos.getY()-2));
