@@ -97,7 +97,7 @@ public class RaceTrack extends VanillaAARectangle {
 		road = rd.road;
 		curIndex = rd.curIndex;
 		crash = ResourceFactory.getFactory().getAudioClip("resources/" + "Crash.wav");
-		decel = new AudioStream("resources/" + "Decel.wav");
+		decel = new AudioStream("resources/" + "Desel.wav");
 		full = new AudioStream("resources/" + "FullIdle.wav");
 		idle = new AudioStream("resources/" + "idle.wav");
 		revup = new AudioStream("resources/" + "revup.wav");

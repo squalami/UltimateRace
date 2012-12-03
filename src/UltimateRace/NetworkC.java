@@ -52,7 +52,7 @@ public class NetworkC {
             } catch (IOException ex) {
                 System.out.println("could not create output stream");
                 System.exit(1);
-            } 
+            }
         }
         else{
             isS=false;

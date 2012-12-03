@@ -212,17 +212,24 @@ public class Game extends StaticScreenGame {
 
 						calcX=car2.startPos.getX()-p1.p1.lowerScreenX;
 						//System.out.println(segOrg.lowerScreenX);
-						double pp=(segOrg.upperScreenX+segOrg.upperScreenW-segOrg.lowerScreenX+segOrg.lowerScreenW);
-						double ppp=(p2.p1.upperScreenX+p2.p1.upperScreenW-p2.p1.lowerScreenX+p2.p1.lowerScreenW);
-						calcX=calcX*(pp/ppp);
+						//double pp=(segOrg.upperScreenX+segOrg.upperScreenW-segOrg.lowerScreenX+segOrg.lowerScreenW);
+						//double ppp=(p2.p1.upperScreenX+p2.p1.upperScreenW-p2.p1.lowerScreenX+p2.p1.lowerScreenW);
+						//calcX=calcX*(pp/ppp);
 						car2.scal2H=(segOrg.lowerScreenY-segOrg.upperScreenY)/(p2.p1.lowerScreenY-p2.p1.upperScreenY);
+                                                calcX=calcX*car2.scal2H;
 						car2.currWidth=(int)(car2.getWidth()*car2.scal2H);
 						car2.currHeight=(int)(car2.getHeight()*car2.scal2H);
 						//car2.setPosition(new Vector2D(segOrg.lowerScreenX,car2.startPos.getY()));
-						if(calcX<0)
-							car2.setCenterPosition(new Vector2D(segOrg.lowerScreenX+calcX+car2.getWidth()/2,segOrg.lowerScreenY-car2.currHeight));
-						else
-							car2.setCenterPosition(new Vector2D(segOrg.lowerScreenX+calcX+car2.getWidth()/2,segOrg.lowerScreenY-car2.currHeight));
+                                                System.out.println(car2.scal2H);
+                                                if(car2.scal2H<.3){
+                                                    car2.setActivation(false);
+                                                }
+                                                else{
+                                                    if(calcX<0)
+                                                            car2.setPosition(new Vector2D(segOrg.lowerScreenX+calcX,segOrg.upperScreenY-56*car2.scal2H));
+                                                    else
+                                                            car2.setPosition(new Vector2D(segOrg.lowerScreenX+calcX,segOrg.upperScreenY-56*car2.scal2H));
+                                                }
 						//will use segment resizing factor to determine car resizing
 
 
@@ -318,22 +325,35 @@ public class Game extends StaticScreenGame {
 						calcX=car1.startPos.getX()-p2.p1.lowerScreenX;
 
 						//get lenght of segment car will be put one
-						double pp=(segOrg.upperScreenX+segOrg.upperScreenW-segOrg.lowerScreenX+segOrg.lowerScreenW);
+						//double pp=(segOrg.upperScreenX+segOrg.upperScreenW-segOrg.lowerScreenX+segOrg.lowerScreenW);
 						//get length of orginal segment
-						double ppp=(p2.p1.upperScreenX+p2.p1.upperScreenW-p2.p1.lowerScreenX+p2.p1.lowerScreenW);
+						//double ppp=(p2.p1.upperScreenX+p2.p1.upperScreenW-p2.p1.lowerScreenX+p2.p1.lowerScreenW);
 
 						//times x distance by ratio to get actual distance the car will travel on the new segment
-						calcX=calcX*(pp/ppp);
+						//calcX=calcX*(pp/ppp);
 						car1.scal2H=(segOrg.lowerScreenY-segOrg.upperScreenY)/(p1.p1.lowerScreenY-p1.p1.upperScreenY);
+                                                calcX=calcX*car1.scal2H;
 						car1.currWidth=(int)(car1.getWidth()*car1.scal2H);
 						car1.currHeight=(int)(car1.getHeight()*car1.scal2H);
+                        
+                                                
 						//if calcX< o car is to the left of x mid, else its to the right
-						if(calcX<0)
-							car1.setCenterPosition(new Vector2D(segOrg.lowerScreenX+calcX+car1.getWidth()/2,segOrg.lowerScreenY-car1.currHeight));
-						else
-							car1.setCenterPosition(new Vector2D(segOrg.lowerScreenX+calcX+car1.getWidth()/2,segOrg.lowerScreenY-car1.currHeight));
-
-
+                                                System.out.println(segOrg.lowerScreenX+","+segOrg.upperScreenX);
+                                                
+                                                //car is hard to see after this and position becomes an issue
+                                                if(car1.scal2H<=.3){
+                                                    car1.setActivation(false);
+                                                }
+                                                else{
+                                                    if(calcX<0){
+                                                           // car1.setCenterPosition(new Vector2D(segOrg.lowerScreenX+calcX+car1.currWidth/2,segOrg.lowerScreenY-car1.currHeight));
+                                                        car1.setPosition(new Vector2D(segOrg.lowerScreenX+calcX,segOrg.upperScreenY-56*car1.scal2H));
+                                                    }
+                                                    else{
+                                                        car1.setPosition(new Vector2D(segOrg.lowerScreenX+calcX,segOrg.upperScreenY-56*car1.scal2H));
+                                                            //car1.setCenterPosition(new Vector2D(segOrg.lowerScreenX+calcX+car1.currWidth/2,segOrg.lowerScreenY-car1.getHeight()));
+                                                    }
+                                                }
 						//car1.scal2W=segOrg.lowerScreenW/p1.p1.lowerScreenW;
 						//System.out.println(car1.scal2H+","+car2.scal2W);
 						break;
