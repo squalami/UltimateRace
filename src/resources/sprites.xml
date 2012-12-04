@@ -47,6 +47,22 @@
         <height>40</height>
      </frameset>
 
+     <frameset>
+        <name>fire</name>
+        <top>360</top>
+        <left>0</left>
+        <width>15</width>
+        <height>28</height>
+     </frameset>
+
+     <frameset>
+        <name>smoke</name>
+        <top>360</top>
+        <left>15</left>
+        <width>15</width>
+        <height>40</height>
+     </frameset>	
+
 
     
     
