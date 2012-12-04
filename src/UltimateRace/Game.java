@@ -63,13 +63,14 @@ public class Game extends StaticScreenGame {
 	BodyLayer<Background> backgroundLayer;
 	NetworkC GameNet;
 	boolean isServ;
-	boolean isNet=false;
+	boolean isNet=true;
 	String IP;
 	RoadSegment carRoad;
 	CarHitRumbles hitRumbles;
 	CarHitGrass hitGrass;
 
 	VanillaPhysicsEngine checkCollisions = new VanillaPhysicsEngine();
+	
 
 	public Game() {
 		super(WORLD_WIDTH, WORLD_HEIGHT, false);
@@ -224,7 +225,7 @@ public class Game extends StaticScreenGame {
 						double pp=(segOrg.upperScreenX+segOrg.upperScreenW-segOrg.lowerScreenX+segOrg.lowerScreenW);
 						double ppp=(p2.p1.upperScreenX+p2.p1.upperScreenW-p2.p1.lowerScreenX+p2.p1.lowerScreenW);
 						calcX=calcX*(pp/ppp);
-						car2.scal2H=(segOrg.lowerScreenY-segOrg.upperScreenY)/(p2.p1.lowerScreenY-p2.p1.upperScreenY);
+						car2.scal2H=(segOrg.grassRight-segOrg.grassLeft)/(p2.p1.grassRight-p2.p1.grassLeft);
 						car2.currWidth=(int)(car2.getWidth()*car2.scal2H);
 						car2.currHeight=(int)(car2.getHeight()*car2.scal2H);
 						//car2.setPosition(new Vector2D(segOrg.lowerScreenX,car2.startPos.getY()));
@@ -333,7 +334,7 @@ public class Game extends StaticScreenGame {
 
 						//times x distance by ratio to get actual distance the car will travel on the new segment
 						calcX=calcX*(pp/ppp);
-						car1.scal2H=(segOrg.lowerScreenY-segOrg.upperScreenY)/(p1.p1.lowerScreenY-p1.p1.upperScreenY);
+						car1.scal2H=(segOrg.grassRight-segOrg.grassLeft)/(p2.p1.grassRight-p2.p1.grassLeft);
 						car1.currWidth=(int)(car1.getWidth()*car1.scal2H);
 						car1.currHeight=(int)(car1.getHeight()*car1.scal2H);
 						//if calcX< o car is to the left of x mid, else its to the right
