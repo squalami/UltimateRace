@@ -20,6 +20,9 @@ class carS implements java.io.Serializable{
         //used mainly to denote the end of track
         //true means more tracks to come, false means last track
         
+    
+        //socket message stuff for 3 computers
+        int carNum;
         /**
 	 * 
 	 */
