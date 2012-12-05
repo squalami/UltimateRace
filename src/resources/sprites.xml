@@ -47,7 +47,37 @@
         <height>40</height>
      </frameset>
 
+     <frameset>
+        <name>fire</name>
+        <top>360</top>
+        <left>0</left>
+        <width>15</width>
+        <height>28</height>
+     </frameset>
 
+     <frameset>
+        <name>smoke</name>
+        <top>360</top>
+        <left>15</left>
+        <width>15</width>
+        <height>40</height>
+     </frameset>	
+
+     <frameset>
+        <name>billboard</name>
+        <top>344</top>
+        <left>520</left>
+        <width>200</width>
+        <height>156</height>
+     </frameset>
+
+     <frameset>
+        <name>tree</name>
+        <top>381</top>
+        <left>409</left>
+        <width>112</width>
+        <height>120</height>
+     </frameset>
     
     
 </spriteset>
