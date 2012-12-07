@@ -19,14 +19,14 @@ import jig.engine.util.Vector2D;
 public class RaceTrack extends VanillaAARectangle {
 
 	static int cameraHeight  = 500;
-	static int roadWidth     = 300;            
+	static int roadWidth     = 400;            
 	static int segmentLength = 25;  
 	static int fieldOfView = 135;  
 	static int drawDistance   = 150;             
 	static int rumbleLength  = 3; 
 
 	int trackLength    = 0;            
-	int lanes = 2;             
+	int lanes = 3;             
 
 	double screenX = 0;
 	double screenY = 0;	
@@ -78,8 +78,9 @@ public class RaceTrack extends VanillaAARectangle {
 	AudioStream full;
 	AudioStream idle;
 	AudioStream revup;
-	static AudioStream rsound;
-	AudioStream skid;	
+	AudioStream rsound;
+	AudioStream skid;
+	AudioStream standRevup;
 
 	public RaceTrack(String sprite, GameFrame gameframe, Car car, Grass g, Road rd, Rumbles r) {
 		super(sprite);
@@ -103,6 +104,7 @@ public class RaceTrack extends VanillaAARectangle {
 		revup = new AudioStream("resources/" + "revup.wav");
 		rsound = new AudioStream("resources/" + "Rumble.wav");
 		skid = new AudioStream("resources/" + "Skid.wav");
+		standRevup = new AudioStream("resources/" + "standRevup.wav");
 
 	}
 
@@ -112,6 +114,7 @@ public class RaceTrack extends VanillaAARectangle {
 		double preCarX = carX;
 		time++;
 		curIndex = Rd.curIndex;
+		
 		if (hitGrass) {
 			curMaxSpeed = 0.15;
 		} else {
@@ -136,28 +139,55 @@ public class RaceTrack extends VanillaAARectangle {
 			startTrack = false;
 
 		}
+		
+		car.state = curSegment.state;
+		
+		if (Game.standRevup) {
+			car.setFire = true;
+			car.setSmoke = true;
+			idle.pause();
+			if (standRevup.getState() == AudioState.PAUSED) {
+				standRevup.resume();
+			} else {
+				standRevup.loop(1.5,medLoop);
+			}
+		} else {
+			car.setFire = false;
+			car.setSmoke = false;
+			standRevup.pause();
+		}
 
 		if (Game.speedUp) {
 			if (car.speed < curMaxSpeed) {
 				car.speed += 0.001;
 				if (decel.getState() == AudioState.PLAYING) decel.pause();
-				if (car.speed > 0 && car.speed < 0.7) {
+				if (car.speed > 0 && car.speed < 0.4) {
+					car.setFire = true;
+					car.setSmoke = true;
+					if (car.offRoad) {
+						car.setSmoke = false;
+					}
 					if (full.getState() == AudioState.PLAYING) full.pause();
 					if (revup.getState() == AudioState.PAUSED ) {
 						revup.resume();
 					} else if (revup.getState() == AudioState.PRE
 				         || revup.getState() == AudioState.STOPPED){
-						revup.loop(2,medLoop);
+						revup.loop(1.5,medLoop);
 					}
-				} else if (car.speed >= 0.7) {
+				} else if (car.speed >= 0.4) {
+					car.setSmoke = false;
 					revup.pause();
 					if (full.getState() == AudioState.PAUSED )
 						full.resume();
 					else
 					    full.loop(2,bigLoop);
+					
+					if (car.speed > 0.6) {
+						car.setFire = false;
+					}
 				}
 			} else {
-				if (car.speed > 0.7) {
+				if (car.speed > 0.4) {
 					revup.pause();
 					if (full.getState() == AudioState.PAUSED )
 						full.resume();
@@ -224,21 +254,25 @@ public class RaceTrack extends VanillaAARectangle {
 		// TODO Auto-generated method stub
 		double xL = carPos.getX();
 		double xR = xL + car.getWidth();
-		
+		double cY = carPos.getY();
 		
 		// hit rumble strips
+		
 		if ((xL < curSegment.rumbleLeft && xR > curSegment.rumbleLeft - rumbleLength) || 
 				(xR > curSegment.rumbleRight && xL < curSegment.rumbleRight + rumbleLength)) {
+			//System.out.println("hit rumble");
+			hitRumble = true;
 			if (car.speed > 0) {
 				if (revup.getState() == AudioState.PLAYING) revup.pause();
 				if (full.getState() == AudioState.PLAYING) full.pause();
+				if (idle.getState() == AudioState.PLAYING) idle.pause();
 				if (rsound.getState() == AudioState.PAUSED)
 					rsound.resume();
 				else
-					rsound.loop(0.4, 0);
-				double cY = carPos.getY();
+					rsound.loop(5, smallLoop);
+				
 				if (cY == carPrePos.getY()) {
-					car.setPosition(new Vector2D(carPos.getX(),carPos.getY()-2));
+					car.setPosition(new Vector2D(carPos.getX(),carPos.getY()-5));
 
 				}
 				else if (cY < carPrePos.getY()) {
@@ -251,10 +285,10 @@ public class RaceTrack extends VanillaAARectangle {
 		}
 
 		// hit grasses
-
-		else if (xL < curSegment.grassLeft || xR > curSegment.grassRight) {
+		else if (xR <= curSegment.grassLeft || xR >= curSegment.grassRight) {
 			hitGrass = true;
 			rsound.pause();
+			car.offRoad = true;
 			if (car.speed > 0.15) {
 				if (full.getState() == AudioState.PLAYING)
 					full.pause();
@@ -262,25 +296,32 @@ public class RaceTrack extends VanillaAARectangle {
 				if (decel.getState() == AudioState.PAUSED) 
 					decel.resume();
 				else
-					decel.loop(0.6,medLoop);
+					decel.loop(1.5,medLoop);
 				
 			}
 		} else {
 			hitGrass = false;
+			hitRumble = false;
 			rsound.pause();
+			car.offRoad = false;
 			//if (decel.getState() == AudioState.PLAYING) decel.pause();
-			if (car.speed < 0.0005) {
+			if (car.speed < 0.0005 && !Game.standRevup) {
 				if (revup.getState() == AudioState.PLAYING)  revup.pause();
 				if (idle.getState() != AudioState.PLAYING) {
-					idle.loop(3,medLoop);
+					idle.loop(1,medLoop);
 				}
 			} else if (car.speed > 0) {
                 idle.pause();
               
 			}
+			if (cY < carPrePos.getY()) {
+				car.setPosition(new Vector2D(carPos.getX(),carPrePos.getY()));
+
+			}
 		}
 		
 		if (curSegment.curve && car.speed > 0.4) {
+			car.setSmoke = true;
 			if (skid.getState() == AudioState.PAUSED)
 				skid.resume();
 			else
@@ -291,7 +332,7 @@ public class RaceTrack extends VanillaAARectangle {
 
 	}
 
-	@Override
+ 	@Override
 	public void render(RenderingContext rc) {		
 		//super.render(rc);
 	}
