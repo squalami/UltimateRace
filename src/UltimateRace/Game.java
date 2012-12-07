@@ -43,7 +43,9 @@ public class Game extends StaticScreenGame {
 
 	//new stuff needed for more than 2 playe multi
 	Car TrueCar;        //since we have may cars now we will use this variable to refer to the cleints actual car
-	int carNum;         
+	int carNum;
+        Car otherCar1;      //These are needed to simplyfy code in networking. see networking code bellow
+        Car otherCar2;
        
 	Car car1;
 	Car car2;
