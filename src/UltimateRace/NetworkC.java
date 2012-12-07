@@ -112,32 +112,9 @@ public class NetworkC {
                     connectionList[i]=serv1.accept();
                     //setup the output stream temperarly to send over new port data
                     outList[i]=new ObjectOutputStream(connectionList[i].getOutputStream());
-                    //carS n1=new carS();
-                    //n1.portNum=currentPort;
-                    //outList[i].writeObject(n1);
-                    //once data is out, we close the connection and wait for a second conenction on the new port;
-                    //outList[i].close();
-                    //servs[i].close();
-                    //servs[i]=new ServerSocket(currentPort);
-                    //connectionList[i]=serv1.accept();
-                    //outList[i]=new ObjectOutputStream(connectionList[i].getOutputStream());
                     InList[i]=new ObjectInputStream(connectionList[i].getInputStream());
-                    //serv1.close();
-                    //currentPort++;
-                    System.out.println("connection "+i+" done");
+
                 }
-                System.out.println(i);
-                //setup the last connection with the standard port
-                //serv1=new ServerSocket(startPort);
-                //connectionList[i]=serv1.accept();
-                //outList[i]=new ObjectOutputStream(connectionList[i].getOutputStream());
-                //InList[i]=new ObjectInputStream(connectionList[i].getInputStream());
-                //carS n2;
-                //n2=new carS();
-                //n2.portNum=startPort;
-                //outList[i].writeObject(n2);
-                //isS=true;
-                //System.out.println("connection 2 done");
             } catch (IOException ex) {
                System.out.println("issue creating socket");
                 System.exit(1);
@@ -147,24 +124,7 @@ public class NetworkC {
             try {
                 s1=new Socket(IP,8001);
                 in=new ObjectInputStream(s1.getInputStream());
-                //carS n1=new carS();
-                //try {
-                    //n1=(carS)in.readObject();
-                //} catch (ClassNotFoundException ex) {
-                   //System.out.println("Don't have the carS class");
-                  // System.exit(1);
-                //}
-               // System.out.println(n1.portNum);
-               // if(n1.portNum!=8001){
-                    //was given a port other than the norm so we create a new connection
-                    //s1.close();
-                    //in.close();
-                    //s1=new Socket(IP,n1.portNum);
-                    //in=new ObjectInputStream(s1.getInputStream());
-                    //out=new ObjectOutputStream(s1.getOutputStream());
-                //}
                 out=new ObjectOutputStream(s1.getOutputStream());
-                System.out.println("connection made");
             } catch (UnknownHostException ex) {
                 System.out.println("issue creating socket");
                 System.exit(1);

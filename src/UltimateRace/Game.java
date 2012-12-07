@@ -113,7 +113,7 @@ public class Game extends StaticScreenGame {
                         System.out.println("Host or client: ");
                         IP=s2.nextLine();
                         if(IP.equalsIgnoreCase("host")){
-                            System.out.println("Number of players: ");
+                            System.out.println("Number of other players: ");
                             int playerNum=s2.nextInt();
                             GameNet=new NetworkC("none",playerNum);
                             isServ=true;
@@ -133,8 +133,8 @@ public class Game extends StaticScreenGame {
                             s1=GameNet.reciveData();
                             carNum=s1.carNum;
                             if(s1.carNum==2){
-                            otherCar1=car1;
-                            otherCar2=car3;
+                                otherCar1=car1;
+                                otherCar2=car3;
                                 raceTrack = new RaceTrack(SPRITE_SHEET + "#trans",gameframe,
 						car2,  // this to be modified in network mode
 						grass,
@@ -144,7 +144,7 @@ public class Game extends StaticScreenGame {
                                 TrueCar=car2;
                                  //TO do setup 2nd car stuff
                             }
-                            else{
+                            else{                                
                                 otherCar1=car1;
                                 otherCar2=car2;
                                 raceTrack = new RaceTrack(SPRITE_SHEET + "#trans",gameframe,
@@ -293,26 +293,17 @@ public class Game extends StaticScreenGame {
                                 carS car2Data;      
                                 carS car3Data;
                                 int carsFound=0;
-                                if(np2[0].carNum==2){
-                                    car2Seg=np2[0].p1.index;
-                                    car2Data=np2[0];
-                                    car3Seg=np2[1].p1.index;
-                                    car3Data=np2[1];
-                                }
-                                else{
-                                    car2Seg=np2[1].p1.index;
-                                    car2Data=np2[1];
-                                    car3Seg=np2[0].p1.index;
-                                    car3Data=np2[0];
-                                }
-                                int currCarIndex=np1[0].p1.index;
+                                 car2Data=np1[0];
+                                 car3Data=np1[1];
+                                 
+                                int currCarIndex=np2[0].p1.index;
                                 for(int i=0;i<raceTrack.drawDistance;i++){
-                                    if(car2Seg==currCarIndex){
+                                    if(car2Data.p1.index==currCarIndex){
                                         car2.setActivation(true);
                                         carsFound++;
                                         //do ofther car2 stuff
                                     }
-                                    if(car3Seg==currCarIndex){
+                                    if(car3Data.p1.index==currCarIndex){
                                         car3.setActivation(true);
                                         carsFound++;
                                         //do other car 3 stuff
@@ -349,6 +340,7 @@ public class Game extends StaticScreenGame {
 				else
 					car3.state=State.UP;
                                 //DO positioning
+                                Postioning(car1,car2,car3,np2[0].p1,car2.currSegment,car3.currSegment);
                              */
 				p1=GameNet.reciveData();
 				car2Dist=p1.carDist;
@@ -531,6 +523,7 @@ public class Game extends StaticScreenGame {
 				else
 					otherCar2.state=State.UP;
                                 //DO positioning
+                                Postioning(Truecar,otherCar1,otherCar2,np1[0].p1,otherCar1.currSegment,otherCar2.currSegment);
                              */
 				//send ovet all needed data
 				p1=new carS();
@@ -654,6 +647,194 @@ public class Game extends StaticScreenGame {
 
 	}
 
+        //3 car base race postioning finding, will try to far car farthest ahead then use 2 car for other 2
+        public void Positioning(Car c1,Car c2,Car c3,RoadSegment seg1,RoadSegment seg2,RoadSegment seg3){
+            if(c1.lap>c2.lap){
+                if(c1.lap>c3.lap){
+                    c1.RacePos=1;
+                    doPos(c2,c3,seg2,seg3);
+                    c2.RacePos++;
+                    c3.RacePos++;
+                }
+                else if(c1.lap<c3.lap){
+                    c3.RacePos=1;
+                    c1.RacePos=2;
+                    c2.RacePos=3;
+                }
+                else{
+                    c2.RacePos=3;
+                    doPos(c1,c3,seg1,seg3);
+
+                }
+            }
+            else if(c1.lap<c2.lap){
+                if(c2.lap>c3.lap){
+                        c2.RacePos=1;
+                        doPos(c1,c3,seg1,seg3);
+                        c1.RacePos++;
+                        c3.RacePos++;
+                }
+                else if(c2.lap<c3.lap){
+                    c3.RacePos=1;
+                    c1.RacePos=3;
+                    c2.RacePos=2;
+                }
+                else{
+                    c1.RacePos=3;
+                    doPos(c2,c3,seg2,seg3);
+                }
+            }
+            else{
+                if(c3.lap>c2.lap){
+                    c3.RacePos=1;
+                    doPos(c1,c2,seg1,seg2);
+                    c1.RacePos++;
+                    c2.RacePos++;
+                }
+                else if(c2.lap>c3.lap){
+                    c3.RacePos=3;
+                    doPos(c1,c2,seg1,seg2);
+                }
+                else{
+                    //Laps same so we do segments
+                    if(seg1.index>seg2.index){
+                        if(seg1.index>seg3.index){
+                            c1.RacePos=1;
+                            doPos(c2,c3,seg2,seg3);
+                            c2.RacePos++;
+                            c3.RacePos++;
+                        }
+                        else if(seg1.index<seg3.index){
+                            c3.RacePos=1;
+                            c1.RacePos=2;
+                            c2.RacePos=3;
+                        }
+                        else{
+                            c2.RacePos=3;
+                            doPos(c1,c3,seg1,seg3);
+                        }
+                    }
+                    else if(seg1.index<seg2.index){
+                        if(seg2.index>seg3.index){
+                            c2.RacePos=1;
+                            doPos(c1,c3,seg1,seg3);
+                            c1.RacePos++;
+                            c3.RacePos++;
+                        }
+                        else if(seg2.index<seg3.index){
+                            c3.RacePos=1;
+                            c2.RacePos=2;
+                            c1.RacePos=3;
+                        }
+                        else{
+                            c2.RacePos=3;
+                            doPos(c1,c3,seg1,seg3);
+                        }
+                    }
+                    else{
+                        if(seg3.index>seg2.index){
+                            c3.RacePos=1;
+                            doPos(c1,c2,seg1,seg2);
+                            c1.RacePos++;
+                            c2.RacePos++;
+                        }
+                        else if(seg3.index<seg2.index){
+                            c3.RacePos=3;
+                            doPos(c1,c2,seg1,seg2);
+                        }
+                        else{
+                            //same lap and segment now we look at postion
+                          if(seg1.upperScreenY>seg2.upperScreenY){
+                            if(seg1.upperScreenY>seg3.upperScreenY){
+                                c1.RacePos=1;
+                                doPos(c2,c3,seg2,seg3);
+                                c3.RacePos++;
+                                c2.RacePos++;
+                            }
+                            else if(seg1.upperScreenY<seg3.upperScreenY){
+                                c3.RacePos=1;
+                                c1.RacePos=2;
+                                c2.RacePos=3;
+                            }
+                            else{
+                                c2.RacePos=3;
+                                doPos(c1,c3,seg1,seg3);
+                            }
+                        }
+                        else if(seg1.upperScreenY<seg2.upperScreenY){
+                            if(seg2.upperScreenY>seg3.upperScreenY){
+                                c2.RacePos=1;
+                                doPos(c1,c3,seg1,seg3);
+                                c1.RacePos++;
+                                c3.RacePos++;
+                            }
+                            else if(seg2.upperScreenY<seg3.upperScreenY){
+                                c3.RacePos=1;
+                                c2.RacePos=2;
+                                c1.RacePos=3;
+                            }
+                            else{
+                                c2.RacePos=3;
+                                doPos(c1,c3,seg1,seg3);
+                            }
+                        }
+                        else{
+                            if(seg3.upperScreenY>seg2.lowerScreenY){
+                                c3.RacePos=1;
+                                doPos(c1,c2,seg1,seg2);
+                                c1.RacePos++;
+                                c2.RacePos++;
+                            }
+                            else if(seg3.upperScreenY<seg2.upperScreenY){
+                                c3.RacePos=3;
+                                doPos(c1,c2,seg1,seg2);
+                            }
+                            else{
+                                c1.RacePos=1;
+                                c2.RacePos=1;
+                                c3.RacePos=1;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+     }
+        
+        //Two car calculations
+        public void doPos(Car c1,Car c2,RoadSegment seg1,RoadSegment seg2){
+            if(c1.lap>c2.lap){
+                c1.RacePos=1;
+		c2.RacePos=2;
+            }
+            else if(c1.lap<c2.lap){
+                c2.RacePos=1;
+		c1.RacePos=2;
+            }
+            else{
+		//same lap use segment number
+                if(seg1.index>seg2.index){
+                    c1.RacePos=1;
+                    c2.RacePos=2;
+                }
+		else if(seg1.index<seg2.index){
+                    c2.RacePos=1;
+                    c1.RacePos=2;
+		}
+		else{
+                    //same segment, will use current segments upper x value;
+                    if(seg1.upperScreenY>seg2.upperScreenY){
+                        c2.RacePos=2;
+			c1.RacePos=1;
+                    }
+                    else{
+                        c1.RacePos=1;
+			c2.RacePos=2;
+                    }
+		}
+            }
+        }
+        
 	/**
 	 * Render the shapes, and possible shape markup
 	 */
