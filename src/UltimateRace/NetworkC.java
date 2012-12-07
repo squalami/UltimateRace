@@ -99,12 +99,10 @@ public class NetworkC {
             try {
                 int i=0;
                 int startPort=8001;
-                int currentPort=8002;
                 connectionList=new Socket[numConnections];
                 InList=new ObjectInputStream [numConnections];
                 outList=new ObjectOutputStream [numConnections];
                 serv1=new ServerSocket(startPort);
-                //servs=new ServerSocket[numConnections];
                 //give each connection besides the last a new port
                 for(i=0;i<numConnections;i++){
                     //for each all clients will connection on the same port orginal and then will be given new ports

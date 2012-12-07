@@ -128,7 +128,6 @@ public class Game extends StaticScreenGame {
                     
                     
                     //new multiplayer setup for more than 3 players
-                   /*
                         Scanner s2=new Scanner(System.in);
                         System.out.println("Host or client: ");
                         IP=s2.nextLine();
@@ -143,6 +142,12 @@ public class Game extends StaticScreenGame {
                             GameNet.sendData2(s1,0);
                             s1.carNum=3;
                             GameNet.sendData2(s1,1);
+                            raceTrack = new RaceTrack(SPRITE_SHEET + "#trans",gameframe,
+						car1,  // this to be modified in network mode
+						grass,
+						road,
+						rumbles
+						);
                         }
                         else{
                             System.out.println("Host ip address: ");
@@ -177,7 +182,12 @@ public class Game extends StaticScreenGame {
                                 //TO do setup 3rd car stuff
                             }
                         }
-                   */
+                    }
+                else{
+                    
+                }
+                   
+                    /*
 			System.out.println("Please enter none for host or an ip for client: ");
 			Scanner s=new Scanner(System.in);
 			IP=s.nextLine();
@@ -208,7 +218,7 @@ public class Game extends StaticScreenGame {
 					road,
 					rumbles
 					);
-
+               */
 		rtLayer = new AbstractBodyLayer.IterativeUpdate<RaceTrack>();
 		rtLayer.add(raceTrack);
 		gameObjectLayers.add(rtLayer);
@@ -254,8 +264,14 @@ public class Game extends StaticScreenGame {
 			if (isServ) {
 				gameObjectLayers.add(new GameUI(car1));
 			} else {
+                            
+                            if(carNum==2)
 				gameObjectLayers.add(new GameUI(car2));
-			}
+                            else if(carNum==3)
+                                gameObjectLayers.add(new GameUI(car3));
+                            else
+                                gameObjectLayers.add(new GameUI(car2));
+                        }
 		} else {
 			gameObjectLayers.add(new GameUI(car1));
 		}
@@ -283,7 +299,7 @@ public class Game extends StaticScreenGame {
 		if(isNet){
 			if(isServ){
                                 //more than 1 car stuff
-                              /*
+                              //
                                 //reciving data 
                                 np1[0]=GameNet.readData2(0);
                                 np1[1]=GameNet.readData2(1);
@@ -364,8 +380,9 @@ public class Game extends StaticScreenGame {
 				else
 					car3.state=State.UP;
                                 //DO positioning
-                                Postioning(car1,car2,car3,np2[0].p1,car2.currSegment,car3.currSegment);
-                             */
+                                Positioning(car1,car2,car3,np2[0].p1,car2.curSegment,car3.curSegment);
+                             //
+                              /*
 				p1=GameNet.reciveData();
 				car2Dist=p1.carDist;
 				p2=new carS();
@@ -434,44 +451,16 @@ public class Game extends StaticScreenGame {
 					car2.state=State.UP;
 				car2.curSegment=segOrg;
 				//finding postion use lap numbe first
-				if(car1.lap>car2.lap){
-					car1.RacePos=1;
-					car2.RacePos=2;
-				}
-				else if(car1.lap<car2.lap){
-					car2.RacePos=1;
-					car1.RacePos=2;
-				}
-				else{
-					//same lap use segment number
-					if(p2.p1.index>segOrg.index){
-						car1.RacePos=1;
-						car2.RacePos=2;
-					}
-					else if(p2.p1.index<segOrg.index){
-						car2.RacePos=1;
-						car1.RacePos=2;
-					}
-					else{
-						//same segment, will use distance to end of segment in the y for position
-						if(car1Dist<car2Dist){
-							car2.RacePos=1;
-							car1.RacePos=2;
-						}
-						else{
-							car1.RacePos=1;
-							car2.RacePos=2;
-						}
-					}
-				}        
+				
+                                doPos(car1,car2,p2.p1,car2.curSegment);
 				//carRoad.roadCenter=p1.p1.roadCenter;
-
+                             */
 
 			}
 			else{
                             
                                 //more than 2 player stuff
-                            /*
+                            //
                                 np1[0]=new carS();
                                 np1[0].p1=raceTrack.findSegment(raceTrack.curZpos+raceTrack.carZ);
                                 np1[0].lap=TrueCar.lap;
@@ -547,8 +536,10 @@ public class Game extends StaticScreenGame {
 				else
 					otherCar2.state=State.UP;
                                 //DO positioning
-                                Postioning(Truecar,otherCar1,otherCar2,np1[0].p1,otherCar1.currSegment,otherCar2.currSegment);
-                             */
+                                Positioning(TrueCar,otherCar1,otherCar2,np1[0].p1,otherCar1.curSegment,otherCar2.curSegment);
+                        }
+                             //
+                                /*
 				//send ovet all needed data
 				p1=new carS();
 				p1.p1=raceTrack.findSegment(raceTrack.curZpos+raceTrack.carZ);
@@ -623,41 +614,13 @@ public class Game extends StaticScreenGame {
 					car1.state=State.UP;
 				car1.curSegment=segOrg;
 
-				if(car1.lap>car2.lap){
-					car1.RacePos=1;
-					car2.RacePos=2;
-				}
-				else if(car1.lap<car2.lap){
-					car2.RacePos=1;
-					car1.RacePos=2;
-				}
-				else{
-					//same lap use segment number
-					if(segOrg.index>p1.p1.index){
-						car1.RacePos=1;
-						car2.RacePos=2;
-					}
-					else if(segOrg.index<p1.p1.index){
-						car2.RacePos=1;
-						car1.RacePos=2;
-					}
-					else{
-						//same segment, will use distance to end of segment in the y for position
-						if(car1Dist<car2Dist){
-							car2.RacePos=1;
-							car1.RacePos=2;
-						}
-						else{
-							car1.RacePos=1;
-							car2.RacePos=2;
-						}
-					}
-				}
+				doPos(car1,car2,car1.curSegment,p1.p1)
 
 
 			}
-
+                        */
 		}
+                
 		car1Pos = car1.getPosition();
 		car2Pos = car2.getPosition();
 		checkUserInput ();
