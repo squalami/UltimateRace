@@ -34,21 +34,24 @@ public class BuildTrack {
 		curve = 3 * level;
 		hill  = 10 * level;
 		
-		straightSegments(45);
+		straightSegments(25);
 		curveSegments(35,35,0);
 		curveSegments(35,-35,0);
-		hillSegments(75,35);
-		hillSegments(75,-35);
-		straightSegments(75);
+		hillSegments(45,35);
+		hillSegments(45,-35);
+		straightSegments(35);
+		Scurve(75);
+		straightSegments(35);
 		curveSegments(25,-45,-2);
-		straightSegments(45);
+		straightSegments(35);
+		Scurve(45);
 		rollingHills(45);
 		straightSegments(25);
 		Scurve(75);
 		straightSegments(35);
-		hillSegments(35,35);
-		hillSegments(35,-35);
-		straightSegments(35);		
+		hillSegments(25,25);
+		hillSegments(25,-25);
+		straightSegments(25);		
 				
 	}
 	

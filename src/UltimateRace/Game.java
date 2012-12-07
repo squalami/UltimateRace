@@ -31,6 +31,8 @@ public class Game extends StaticScreenGame {
 	static boolean applybreak = false;
 	static boolean runUpdate = false;
 	static boolean gameIsRun = false;
+	static boolean standRevup = false;
+	
 	static long iniTime = 0;
 
 	static final String XMLFILE = "resources/sprites.xml";
@@ -39,15 +41,14 @@ public class Game extends StaticScreenGame {
 	VanillaPhysicsEngine physics;
 	AudioStream music;
 
-        //new stuff needed for more than 2 playe multi
-        Car TrueCar;        //since we have may cars now we will use this variable to refer to the cleints actual car
-        int carNum;         
-        Car car3;           
-        Car otherCar1;
-        Car otherCar2;
-        
+	//new stuff needed for more than 2 playe multi
+	Car TrueCar;        //since we have may cars now we will use this variable to refer to the cleints actual car
+	int carNum;         
+       
 	Car car1;
 	Car car2;
+	Car car3;           
+
 	RaceTrack raceTrack;
 	Road road;
 	Grass grass;
@@ -60,6 +61,8 @@ public class Game extends StaticScreenGame {
 
 	BodyLayer<Car> car1Layer;
 	BodyLayer<Car> car2Layer;
+	BodyLayer<Car> car3Layer;
+	
 	BodyLayer<RaceTrack> rtLayer;
 	BodyLayer<RaceTrack> rumbleLayer;
 	BodyLayer<Grass> grassLayer;
@@ -70,7 +73,7 @@ public class Game extends StaticScreenGame {
 	BodyLayer<Background> backgroundLayer;
 	NetworkC GameNet;
 	boolean isServ;
-	boolean isNet=true;
+	boolean isNet=false;
 	String IP;
 	RoadSegment carRoad;
 	CarHitRumbles hitRumbles;
@@ -98,12 +101,27 @@ public class Game extends StaticScreenGame {
 		boost = new SpeedBoost(SPRITE_SHEET + "#boost", gameframe);
 
 		car1 = new Car(SPRITE_SHEET + "#redCar",
-				new Vector2D((WORLD_WIDTH/2 - 120),WORLD_HEIGHT-70));
+				new Vector2D((WORLD_WIDTH/2 - 180),WORLD_HEIGHT-70),
+				SPRITE_SHEET + "#fire",
+				SPRITE_SHEET + "#smoke",
+				SPRITE_SHEET + "#cutgrass");
 		car1Pos = car1.getPosition();
 
 		car2 = new Car(SPRITE_SHEET + "#greenCar",
-				new Vector2D((3*WORLD_WIDTH/4 - 120),WORLD_HEIGHT-70));
+				new Vector2D((3*WORLD_WIDTH/4 - 200),WORLD_HEIGHT-70),
+				SPRITE_SHEET + "#fire",
+				SPRITE_SHEET + "#smoke",
+				SPRITE_SHEET + "#cutgrass");
+		
 		car2Pos = car2.getPosition();
+		
+		car3 = new Car(SPRITE_SHEET + "#orangeCar",
+				new Vector2D((3*WORLD_WIDTH/4 - 60),WORLD_HEIGHT-70),
+				SPRITE_SHEET + "#fire",
+				SPRITE_SHEET + "#smoke",
+				SPRITE_SHEET + "#cutgrass");
+		
+		
 		if(isNet){
                     
                     
@@ -218,11 +236,15 @@ public class Game extends StaticScreenGame {
 		car1Layer.add(car1);		
 		car2Layer = new AbstractBodyLayer.IterativeUpdate<Car>();
 		car2Layer.add(car2);
+		car3Layer = new AbstractBodyLayer.IterativeUpdate<Car>();
+		car3Layer.add(car3);
 
 		gameObjectLayers.add(car1Layer);
 		physics.manageViewableSet(car1Layer);
 		gameObjectLayers.add(car2Layer);
 		physics.manageViewableSet(car2Layer);
+		gameObjectLayers.add(car3Layer);
+		physics.manageViewableSet(car3Layer);
 
 		hitRumbles = new CarHitRumbles(car1,rumbles);
 		hitGrass = new CarHitGrass(car1,grassLayer);
@@ -848,6 +870,7 @@ public class Game extends StaticScreenGame {
 		turnRight = keyboard.isPressed(KeyEvent.VK_RIGHT);
 		speedUp = keyboard.isPressed(KeyEvent.VK_UP);
 		applybreak = keyboard.isPressed(KeyEvent.VK_DOWN);
+		standRevup = keyboard.isPressed(KeyEvent.VK_SPACE);
 	}
 
 	public void CollisionHandlers(long deltaMs) {

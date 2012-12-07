@@ -32,52 +32,167 @@
     </frameset>
     
     <frameset>
-        <name>trans</name>
+        <name>orangeCar</name>
         <top>360</top>
         <left>0</left>
-        <width>24</width>
-        <height>24</height>
+        <width>80</width>
+        <height>40</height>
+        <columns>3</columns>
+    </frameset>
+    
+    <frameset>
+        <name>fire</name>
+        <top>400</top>
+        <left>0</left>
+        <width>16</width>
+        <height>16</height>
+        <rows>3</rows>
      </frameset>
 
+    <frameset>
+        <name>trans</name>
+        <top>424</top>
+        <left>0</left>
+        <width>8</width>
+        <height>8</height>
+     </frameset>
+     
+    <frameset>
+        <name>cutgrass</name>
+        <top>400</top>
+        <left>24</left>
+        <width>80</width>
+        <height>48</height>
+     </frameset>
+     
+    <frameset>
+        <name>number1</name>
+        <top>400</top>
+        <left>108</left>
+        <width>32</width>
+        <height>48</height>
+     </frameset>
+     
+    <frameset>
+        <name>number2</name>
+        <top>400</top>
+        <left>144</left>
+        <width>48</width>
+        <height>48</height>
+     </frameset>
+     
+     <frameset>
+        <name>number3</name>
+        <top>400</top>
+        <left>200</left>
+        <width>48</width>
+        <height>48</height>
+     </frameset>
+
+     <frameset>
+        <name>go</name>
+        <top>400</top>
+        <left>248</left>
+        <width>56</width>
+        <height>48</height>
+     </frameset>
+     
+     <frameset>
+        <name>youwin</name>
+        <top>448</top>
+        <left>0</left>
+        <width>320</width>
+        <height>48</height>
+     </frameset>
+     
      <frameset>
         <name>boost</name>
         <top>280</top>
         <left>240</left>
-        <width>40</width>
-        <height>40</height>
+        <width>56</width>
+        <height>64</height>
      </frameset>
-
-     <frameset>
-        <name>fire</name>
-        <top>360</top>
-        <left>0</left>
-        <width>15</width>
-        <height>28</height>
-     </frameset>
-
+     
      <frameset>
         <name>smoke</name>
-        <top>360</top>
-        <left>15</left>
-        <width>15</width>
-        <height>40</height>
-     </frameset>	
-
-     <frameset>
-        <name>billboard</name>
-        <top>344</top>
-        <left>520</left>
-        <width>200</width>
-        <height>156</height>
+        <top>280</top>
+        <left>296</left>
+        <width>120</width>
+        <height>64</height>
+        <rows>2</rows>
      </frameset>
-
-     <frameset>
-        <name>tree</name>
-        <top>381</top>
-        <left>409</left>
-        <width>112</width>
+     
+     
+      <frameset>
+        <name>cactus</name>
+        <top>344</top>
+        <left>240</left>
+        <width>56</width>
+        <height>56</height>
+     </frameset>
+ 
+      <frameset>
+        <name>billboard</name>
+        <top>280</top>
+        <left>416</left>
+        <width>136</width>
         <height>120</height>
      </frameset>
-    
+     
+      <frameset>
+        <name>stone1</name>
+        <top>280</top>
+        <left>552</left>
+        <width>72</width>
+        <height>120</height>
+     </frameset>
+
+      <frameset>
+        <name>bush</name>
+        <top>280</top>
+        <left>632</left>
+        <width>88</width>
+        <height>56</height>
+     </frameset>
+  
+      <frameset>
+        <name>stone2</name>
+        <top>336</top>
+        <left>632</left>
+        <width>88</width>
+        <height>56</height>
+     </frameset>
+
+     <frameset>
+        <name>tree1</name>
+        <top>408</top>
+        <left>328</left>
+        <width>96</width>
+        <height>88</height>
+     </frameset>
+  
+    <frameset>
+        <name>tree2</name>
+        <top>400</top>
+        <left>424</left>
+        <width>112</width>
+        <height>96</height>
+     </frameset>
+  
+    <frameset>
+        <name>tree3</name>
+        <top>408</top>
+        <left>536</left>
+        <width>88</width>
+        <height>88</height>
+     </frameset>
+  
+    <frameset>
+        <name>stump</name>
+        <top>408</top>
+        <left>632</left>
+        <width>80</width>
+        <height>88</height>
+     </frameset>
     
 </spriteset>
