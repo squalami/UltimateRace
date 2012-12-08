@@ -49,14 +49,9 @@ public class OffroadObjects extends VanillaAARectangle{
 			if (locationIndex >= bi && locationIndex <= ti) {
 				
 				double dn = road.get(0).w * 0.2;
-				double tn = road.get(rs-1).w;
 				double ws = this.getWidth();
-				//System.out.println("bottom index: "+bi+", top index: "+ti+", check cur index: "+locationIndex+", scaleFactor: "+scaleFactor);
-				
-				//PolyHolder p;
 				for (PolyHolder p: road) {
 					
-					//if (locationIndex < 150) System.out.println(" p.segmentIndex: "+p.segmentIndex+" vs. locationIndex: "+locationIndex);
 					if (locationIndex == p.segmentIndex) {
 						if (p.xL < 0 || p.xR < 0) continue;
 						scaleFactor = p.w /dn;
@@ -70,7 +65,6 @@ public class OffroadObjects extends VanillaAARectangle{
 						if (xPos < 0) continue;
 						active = true;
 						this.setCenterPosition(new Vector2D(xPos,yPos));
-						//System.out.println("xPos: "+xPos+", yPos: "+yPos+", p.xL: "+p.xL+", p.xR:"+p.xR);
 
 					}
 				}
