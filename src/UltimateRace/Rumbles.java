@@ -16,6 +16,7 @@ public class Rumbles extends VanillaAARectangle {
 	
 	public ArrayList<PolyHolder> rumbles = new ArrayList<PolyHolder>();
 	J2DShapeEngine shapeEngine;
+	boolean update = false;
 
 	public Rumbles(String rsc, GameFrame gameframe) {
 		super(rsc);
@@ -26,16 +27,17 @@ public class Rumbles extends VanillaAARectangle {
 	@Override
 	public void update(long deltaMs) {
 		// TODO Auto-generated method stub
+		update = true;
 		
 	}
 
     @Override
 	public void render(RenderingContext rc) {
-		if (rumbles.size() > 0) {
+		if (rumbles.size() > 0  && update) {
 			for (PolyHolder p: rumbles) {
 				shapeEngine.renderFilledPolygon(rc, p.C, p.points);
 			}
 		}
-
+        update = false;
 	}
 }

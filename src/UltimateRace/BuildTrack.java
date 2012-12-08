@@ -5,6 +5,7 @@ package UltimateRace;
  */
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class BuildTrack {
 
@@ -20,6 +21,7 @@ public class BuildTrack {
 	Car.State state;
 
 	public ArrayList<RoadSegment> segments = new ArrayList<RoadSegment>();
+	public static HashMap<Integer,Boolean> curChk = new HashMap<Integer,Boolean>();
 	
 	public BuildTrack(double carZ, Car c) {
 		
@@ -95,7 +97,9 @@ public class BuildTrack {
 		else if (y > 0) { state = Car.State.UP; }
 		else state = Car.State.STRAIGHT;
 		
-		for (int i=0; i < eIn; i++) {			
+		for (int i=0; i < eIn; i++) {
+			if (x != 0) curChk.put(index,true);
+			else curChk.put(index, false);
 			s = new RoadSegment(state,isCurve);
 			s.lowerY = previousY();
 			s.upperY = easeOut(sY,eY,(double)i/total);
@@ -105,6 +109,7 @@ public class BuildTrack {
 			s.index = index;
 			segments.add(s);
 			index++;
+			if (i+3 > eIn && x != 0) isCurve = true;
 		}
 		
 		if (x != 0) {
@@ -112,6 +117,8 @@ public class BuildTrack {
 		}
 		
 		for (int i=0; i < runLength; i++) {
+			if (x != 0) curChk.put(index,true);
+			else curChk.put(index, false);
 			s = new RoadSegment(state,isCurve);
 			s.lowerY = previousY();
 			s.upperY = easeOut(sY,eY,((double)i+eIn)/total);
@@ -126,6 +133,8 @@ public class BuildTrack {
 		isCurve = false;
 		
 		for (int i=0; i < eOut; i++) {
+			if (x != 0) curChk.put(index,true);
+			else curChk.put(index, false);
 			s = new RoadSegment(state,isCurve);
 			s.lowerY = previousY();
 			s.upperY = easeOut(sY,eY,((double)i+eIn+runLength)/total);

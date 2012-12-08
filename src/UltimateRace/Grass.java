@@ -17,7 +17,7 @@ public class Grass extends VanillaAARectangle {
 
 	public ArrayList<PolyHolder> grasses = new ArrayList<PolyHolder>();
 	J2DShapeEngine shapeEngine;
-	
+	boolean update = false;
 	public Grass(String rsc, GameFrame gameframe) {
 		super(rsc);
 		// TODO Auto-generated constructor stub
@@ -28,16 +28,17 @@ public class Grass extends VanillaAARectangle {
 	public void update(long deltaMs) {
 		// TODO Auto-generated method stub
 		//System.out.println("grass array:"+grasses.size());
-		
+		update = true;
 	}
 
     @Override
 	public void render(RenderingContext rc) {
-		if (grasses.size() > 0) {
+		if (grasses.size() > 0 && update) {
 			for (PolyHolder p: grasses) {
 				shapeEngine.renderFilledPolygon(rc, p.C, p.points);
 			}
 		}
+		update = false;
 
 	}
 

@@ -17,6 +17,7 @@ public class Road extends VanillaAARectangle {
 	public ArrayList<PolyHolder> road = new ArrayList<PolyHolder>();
 	int curIndex = 0;
 	J2DShapeEngine shapeEngine;
+	boolean update = false;
 
 	public Road(String rsc, GameFrame gameframe) {
 		super(rsc);
@@ -27,17 +28,17 @@ public class Road extends VanillaAARectangle {
 	@Override
 	public void update(long deltaMs) {
 		// TODO Auto-generated method stub
-		
+		update = true;
 	}
 
     @Override
 	public void render(RenderingContext rc) {
-		if (road.size() > 0) {
+		if (road.size() > 0 && update) {
 			for (PolyHolder p: road) {
 				shapeEngine.renderFilledPolygon(rc, p.C, p.points);
 				curIndex = p.segmentIndex;
 			}
 		}
-
+        update = false;
 	}
 }

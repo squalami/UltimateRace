@@ -13,6 +13,7 @@ import jig.engine.ResourceFactory;
 import jig.engine.audio.AudioState;
 import jig.engine.audio.jsound.AudioClip;
 import jig.engine.audio.jsound.AudioStream;
+import jig.engine.physics.BodyLayer;
 import jig.engine.physics.vpe.VanillaAARectangle;
 import jig.engine.util.Vector2D;
 
@@ -64,7 +65,6 @@ public class RaceTrack extends VanillaAARectangle {
 	int smallLoop = 777;
 	RoadSegment curSegment;
 
-	boolean startTrack = true;
 	boolean hitGrass = false;
 	boolean hitRumble = false;
 	Road Rd;
@@ -72,6 +72,7 @@ public class RaceTrack extends VanillaAARectangle {
 	ArrayList<PolyHolder> grasses;
 	ArrayList<PolyHolder> rumbles;
 	ArrayList<PolyHolder> road;
+	BodyLayer<OffroadObjects> offroadLayer;
 	
 	AudioClip crash;
 	AudioStream decel;
@@ -81,6 +82,8 @@ public class RaceTrack extends VanillaAARectangle {
 	AudioStream rsound;
 	AudioStream skid;
 	AudioStream standRevup;
+	
+	public enum roadObject { Cactus, Billboard, Stone1, Stone2, Bush, Tree1, Tree2, Tree3, Stump }
 
 	public RaceTrack(String sprite, GameFrame gameframe, Car car, Grass g, Road rd, Rumbles r) {
 		super(sprite);
@@ -105,7 +108,11 @@ public class RaceTrack extends VanillaAARectangle {
 		rsound = new AudioStream("resources/" + "Rumble.wav");
 		skid = new AudioStream("resources/" + "Skid.wav");
 		standRevup = new AudioStream("resources/" + "standRevup.wav");
-
+		road.clear();
+		rumbles.clear();
+		grasses.clear();
+		curSegment = null;
+		updateTrack();		    
 	}
 
 	@Override
@@ -128,16 +135,6 @@ public class RaceTrack extends VanillaAARectangle {
 		if (curIndex + 2 > totalIndex) {
 			curZpos = 0;
 			car.lap++;
-		}
-
-		if (startTrack) {
-			road.clear();
-			rumbles.clear();
-			grasses.clear();
-			curSegment = null;
-			updateTrack(deltaMs);		    
-			startTrack = false;
-
 		}
 		
 		car.state = curSegment.state;
@@ -238,7 +235,7 @@ public class RaceTrack extends VanillaAARectangle {
 				rumbles.clear();
 				grasses.clear();
 				curSegment = null;
-				updateTrack(deltaMs);
+				updateTrack();
 				preZpos = curZpos;
 				Game.runUpdate = true;
 			}
@@ -285,7 +282,7 @@ public class RaceTrack extends VanillaAARectangle {
 		}
 
 		// hit grasses
-		else if (xR <= curSegment.grassLeft || xR >= curSegment.grassRight) {
+		else if (xR <= curSegment.grassLeft || xL >= curSegment.grassRight) {
 			hitGrass = true;
 			rsound.pause();
 			car.offRoad = true;
@@ -336,16 +333,15 @@ public class RaceTrack extends VanillaAARectangle {
 	public void render(RenderingContext rc) {		
 		//super.render(rc);
 	}
-	//*	
+	
 	public double increase(double start, double increment, double max) {
 		double result = start + increment;
 		while (result > max) result -= increment;
 		while (result < 0)  result += increment; 
 		return result;		
 	}
-	//*/
 
-	public void updateTrack(long dt) {
+	public void updateTrack() {
 
 		RoadSegment baseSegment = findSegment(curZpos);
 		RoadSegment carSegment = findSegment(curZpos+carZ);
@@ -475,12 +471,17 @@ public class RaceTrack extends VanillaAARectangle {
 		ph.T = t;
 		ph.index = i;
 		ph.segmentIndex = si;
+		ph.xL = minVal(x1,x2,x3,x4);
+		ph.xR = maxVal(x1,x2,x3,x4);
+		ph.yT = y2;
+		ph.yB = y1;
+		ph.w = ph.xR - ph.xL;
 		//System.out.println(" adding polygon type:"+t);
-		if (t == PolyHolder.Type.SEPARATOR || t == PolyHolder.Type.ROAD) {
+		if (t == PolyHolder.Type.ROAD) {
 			road.add(ph);
 		} else if (t == PolyHolder.Type.GRASS) {
 			grasses.add(ph);
-		} else if (t == PolyHolder.Type.RUMBLE) {
+		} else if (t == PolyHolder.Type.SEPARATOR || t == PolyHolder.Type.RUMBLE) {
 			rumbles.add(ph);
 		}		
 	}
@@ -530,4 +531,23 @@ public class RaceTrack extends VanillaAARectangle {
 		return a + (b-a)*percent;                                       
 	}
 
+	private double minVal(double x1, double x2, double x3, double x4) {
+		double min1 = 0;
+		double min2 = 0;
+		if (x1 < x2) min1 = x1;
+		else min1 = x2;
+		if (x3 < x4) min1 = x3;
+		else min2 = x4;
+		return (min1 < min2)? min1: min2;
+	}
+	
+	private double maxVal(double x1, double x2, double x3, double x4) {
+		double max1 = 0;
+		double max2 = 0;
+		if (x1 < x2) max1 = x2;
+		else max1 = x1;
+		if (x3 < x4) max2 = x4;
+		else max2 = x3;
+		return (max1 > max2)? max1: max2;
+	}
 }
