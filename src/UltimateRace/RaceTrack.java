@@ -64,6 +64,10 @@ public class RaceTrack extends VanillaAARectangle {
 	int medLoop = 77777;
 	int smallLoop = 777;
 	RoadSegment curSegment;
+	
+	int fireTimer = 450;
+	int fireTimerCount = 0;
+	boolean startFireTimer = false;
 
 	boolean hitGrass = false;
 	boolean hitRumble = false;
@@ -82,6 +86,7 @@ public class RaceTrack extends VanillaAARectangle {
 	AudioStream rsound;
 	AudioStream skid;
 	AudioStream standRevup;
+	AudioStream boostUp;
 	
 	public enum roadObject { Cactus, Billboard, Stone1, Stone2, Bush, Tree1, Tree2, Tree3, Stump }
 
@@ -108,6 +113,7 @@ public class RaceTrack extends VanillaAARectangle {
 		rsound = new AudioStream("resources/" + "Rumble.wav");
 		skid = new AudioStream("resources/" + "Skid.wav");
 		standRevup = new AudioStream("resources/" + "standRevup.wav");
+		boostUp = new AudioStream("resources/" + "speedBoost.wav");
 		road.clear();
 		rumbles.clear();
 		grasses.clear();
@@ -121,7 +127,9 @@ public class RaceTrack extends VanillaAARectangle {
 		double preCarX = carX;
 		time++;
 		curIndex = Rd.curIndex;
-		
+		if (startFireTimer) {
+			fireTimerCount++;
+		}	
 		if (hitGrass) {
 			curMaxSpeed = 0.15;
 		} else {
@@ -153,12 +161,39 @@ public class RaceTrack extends VanillaAARectangle {
 			car.setSmoke = false;
 			standRevup.pause();
 		}
+		
+
 
 		if (Game.speedUp) {
-			if (car.speed < curMaxSpeed) {
-				car.speed += 0.001;
+			if (startFireTimer) {
+				car.setFire = true;
+				if (full.getState() == AudioState.PLAYING) full.pause();
+				if (boostUp.getState() == AudioState.PAUSED ) {
+					boostUp.resume();
+				} else if (boostUp.getState() == AudioState.PRE
+			         || boostUp.getState() == AudioState.STOPPED){
+					boostUp.loop(1.5,medLoop);
+				}
+				if (car.speed < curMaxSpeed) car.speed += 0.005;
+				if (fireTimerCount >= fireTimer) {
+					fireTimerCount = 0;
+					startFireTimer = false;
+					car.setFire = false;
+					boostUp.pause();
+					startFireTimer = false;
+				}
+			}
+
+			else if (car.speed < curMaxSpeed) {
+				if (car.speed < 1.3) {
+				    car.speed += 0.001;
+				} else if (car.speed >= 1.3 && car.speed < 2.5) {
+					car.speed += 0.0002;
+				} else if (car.speed >= 2.5) {
+					car.speed += 0.00005;
+				}
 				if (decel.getState() == AudioState.PLAYING) decel.pause();
-				if (car.speed > 0 && car.speed < 0.4) {
+				if (car.speed > 0 && car.speed < 0.7) {
 					car.setFire = true;
 					car.setSmoke = true;
 					if (car.offRoad) {
@@ -171,15 +206,16 @@ public class RaceTrack extends VanillaAARectangle {
 				         || revup.getState() == AudioState.STOPPED){
 						revup.loop(1.5,medLoop);
 					}
-				} else if (car.speed >= 0.4) {
+				} else if (car.speed >= 0.7) {
 					car.setSmoke = false;
+					car.setFire = true;
 					revup.pause();
 					if (full.getState() == AudioState.PAUSED )
 						full.resume();
 					else
 					    full.loop(2,bigLoop);
 					
-					if (car.speed > 0.6) {
+					if (car.speed >= 1.3) {
 						car.setFire = false;
 					}
 				}

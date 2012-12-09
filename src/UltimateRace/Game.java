@@ -46,7 +46,7 @@ public class Game extends StaticScreenGame {
 	int carNum;
 	Car otherCar1;      //These are needed to simplyfy code in networking. see networking code bellow
 	Car otherCar2;
-        int NumberOfC;
+	int NumberOfC;
 
 	Car car1;
 	Car car2;
@@ -68,6 +68,9 @@ public class Game extends StaticScreenGame {
 	OffroadObjects tree3;
 	OffroadObjects stump;
 
+	CarHitSpeedBoost hitSpeedBoost;
+	CarHitOffroadObjects hitOffroadObject;
+	
 	static Vector2D car1Pos;   // used for network race track update
 	static Vector2D car2Pos;
 
@@ -86,11 +89,9 @@ public class Game extends StaticScreenGame {
 	BodyLayer<Background> backgroundLayer;
 	NetworkC GameNet;
 	boolean isServ;
-	boolean isNet=true;
+	boolean isNet=false;
 	String IP;
 	RoadSegment carRoad;
-	CarHitRumbles hitRumbles;
-	CarHitGrass hitGrass;
 
 	VanillaPhysicsEngine checkCollisions = new VanillaPhysicsEngine();
 
@@ -110,8 +111,6 @@ public class Game extends StaticScreenGame {
 		road = new Road(SPRITE_SHEET + "#trans",gameframe);
 		rumbles = new Rumbles(SPRITE_SHEET + "#trans",gameframe);
 		grass = new Grass(SPRITE_SHEET + "#trans",gameframe);
-
-		boost = new SpeedBoost(SPRITE_SHEET + "#boost", gameframe);
 
 		car1 = new Car(SPRITE_SHEET + "#redCar",
 				new Vector2D((WORLD_WIDTH/2 - 180),WORLD_HEIGHT-70),
@@ -135,6 +134,7 @@ public class Game extends StaticScreenGame {
 				SPRITE_SHEET + "#cutgrass");
 
 		offroadLayer = new AbstractBodyLayer.IterativeUpdate<OffroadObjects>();
+		boostLayer = new AbstractBodyLayer.IterativeUpdate<SpeedBoost>();
 
 		if(isNet){
 			//new multiplayer setup for more than 3 players
@@ -144,18 +144,18 @@ public class Game extends StaticScreenGame {
 			if(IP.equalsIgnoreCase("host")){
 				System.out.println("Number of other players: ");
 				int playerNum=s2.nextInt();
-                                NumberOfC=playerNum;
+				NumberOfC=playerNum;
 				GameNet=new NetworkC("none",playerNum);
 				isServ=true;
 				carS s1;
 				s1=new carS();
 				s1.carNum=2;
-                                s1.carN=NumberOfC;
+				s1.carN=NumberOfC;
 				GameNet.sendData2(s1,0);
-                                if(NumberOfC>1){
-                                    s1.carNum=3;
-                                    GameNet.sendData2(s1,1);
-                                }
+				if(NumberOfC>1){
+					s1.carNum=3;
+					GameNet.sendData2(s1,1);
+				}
 				raceTrack = new RaceTrack(SPRITE_SHEET + "#trans",gameframe,
 						car1,  // this to be modified in network mode
 						grass,
@@ -171,7 +171,7 @@ public class Game extends StaticScreenGame {
 				carS s1;
 				s1=GameNet.reciveData();
 				carNum=s1.carNum;
-                                NumberOfC=s1.carN;
+				NumberOfC=s1.carN;
 				if(s1.carNum==2){
 					otherCar1=car1;
 					otherCar2=car3;
@@ -213,11 +213,6 @@ public class Game extends StaticScreenGame {
 		gameObjectLayers.add(rtLayer);
 		physics.manageViewableSet(rtLayer);
 
-		boostLayer = new AbstractBodyLayer.IterativeUpdate<SpeedBoost>();
-		boostLayer.add(boost);
-		gameObjectLayers.add(boostLayer);
-		physics.manageViewableSet(boostLayer);
-
 		roadLayer = new AbstractBodyLayer.IterativeUpdate<Road>();
 		roadLayer.add(road);
 		gameObjectLayers.add(roadLayer);
@@ -246,6 +241,17 @@ public class Game extends StaticScreenGame {
 		physics.manageViewableSet(car2Layer);
 		gameObjectLayers.add(car3Layer);
 		physics.manageViewableSet(car3Layer);
+		
+		for (int i=115; i < raceTrack.totalIndex - 150; ) {
+			if (BuildTrack.curChk.containsKey(i) && !BuildTrack.curChk.get(i)) {
+				boost = new SpeedBoost(SPRITE_SHEET + "#boost", raceTrack,i);
+				boostLayer.add(boost);
+				i += 350;
+			} else {
+				i++;
+			}			
+		}
+
 		int repeat = 35;
 		for (int i=15; i < raceTrack.totalIndex - 150;) {
 			if (BuildTrack.curChk.containsKey(i) && !BuildTrack.curChk.get(i)) {
@@ -324,7 +330,7 @@ public class Game extends StaticScreenGame {
 				offroadLayer.add(billboard);
 				i += repeat;
 			}
-			
+
 			if (BuildTrack.curChk.containsKey(i) && !BuildTrack.curChk.get(i)) {
 				stump = new OffroadObjects(SPRITE_SHEET+"#stump",raceTrack,i,false);	
 				offroadLayer.add(stump);
@@ -339,28 +345,43 @@ public class Game extends StaticScreenGame {
 
 		gameObjectLayers.add(offroadLayer);
 		physics.manageViewableSet(offroadLayer);
+		gameObjectLayers.add(boostLayer);
+		physics.manageViewableSet(boostLayer);
 
-		hitRumbles = new CarHitRumbles(car1,rumbles);
-		hitGrass = new CarHitGrass(car1,grassLayer);
 		if (isNet) {
 			if (isServ) {
 				gameObjectLayers.add(new GameUI(car1));
+				hitSpeedBoost = new CarHitSpeedBoost(car1,boostLayer,raceTrack);
+				hitOffroadObject = new CarHitOffroadObjects(car1,offroadLayer,raceTrack);
 			} else {
 
-				if(carNum==2)
+				if(carNum==2) {
 					gameObjectLayers.add(new GameUI(car2));
-				else if(carNum==3)
+					hitSpeedBoost = new CarHitSpeedBoost(car2,boostLayer,raceTrack);
+					hitOffroadObject = new CarHitOffroadObjects(car2,offroadLayer,raceTrack);
+
+				}
+				else if(carNum==3) {
 					gameObjectLayers.add(new GameUI(car3));
-				else
+					hitSpeedBoost = new CarHitSpeedBoost(car3,boostLayer,raceTrack);
+					hitOffroadObject = new CarHitOffroadObjects(car3,offroadLayer,raceTrack);
+
+				}
+				else {
 					gameObjectLayers.add(new GameUI(car2));
+					hitSpeedBoost = new CarHitSpeedBoost(car2,boostLayer,raceTrack);
+					hitOffroadObject = new CarHitOffroadObjects(car2,offroadLayer,raceTrack);
+				}
 			}
 		} else {
 			gameObjectLayers.add(new GameUI(car1));
+			hitSpeedBoost = new CarHitSpeedBoost(car1,boostLayer,raceTrack);
+			hitOffroadObject = new CarHitOffroadObjects(car1,offroadLayer,raceTrack);
+
 		}
 
-
 	}
-	
+
 
 	public void update(long deltaMs) {
 		super.update(deltaMs);
@@ -385,9 +406,9 @@ public class Game extends StaticScreenGame {
 				//
 				//reciving data 
 				np1[0]=GameNet.readData2(0);
-                                if(NumberOfC>1){
-                                    np1[1]=GameNet.readData2(1);
-                                }
+				if(NumberOfC>1){
+					np1[1]=GameNet.readData2(1);
+				}
 				//sending the data
 				np2[0]=new carS();
 				np2[0].p1=raceTrack.findSegment(raceTrack.curZpos+raceTrack.carZ);
@@ -405,12 +426,12 @@ public class Game extends StaticScreenGame {
 				np2[0].carNum=1;
 				np2[1]=np1[1];
 				GameNet.sendData2(np2[0],0);
-                                if(NumberOfC>1){
-                                    GameNet.sendData2(np2[1],0);
-                                    np2[1]=np1[0];
-                                    GameNet.sendData2(np2[0],1);
-                                    GameNet.sendData2(np2[1],1);
-                                }
+				if(NumberOfC>1){
+					GameNet.sendData2(np2[1],0);
+					np2[1]=np1[0];
+					GameNet.sendData2(np2[0],1);
+					GameNet.sendData2(np2[1],1);
+				}
 
 				//start calcualtions
 				car2.setActivation(false);
@@ -419,12 +440,12 @@ public class Game extends StaticScreenGame {
 				int car3Seg;
 				carS car2Data;      
 				carS car3Data;
-                                car3Data=new carS();
+				car3Data=new carS();
 				int carsFound=0;
 				car2Data=np1[0];
-                                if(NumberOfC>1){
-                                    car3Data=np1[1];
-                                }
+				if(NumberOfC>1){
+					car3Data=np1[1];
+				}
 
 				int currCarIndex=np2[0].p1.index;
 				for(int i=0;i<raceTrack.drawDistance;i++){
@@ -433,19 +454,19 @@ public class Game extends StaticScreenGame {
 						carsFound++;
 						//do ofther car2 stuff
 					}
-                                        if(NumberOfC>1){
-                                            if(car3Data.p1.index==currCarIndex){
-                                                    car3.setActivation(true);
-                                                    carsFound++;
-						//do other car 3 stuff
-                                            }
-                                        }
+					if(NumberOfC>1){
+						if(car3Data.p1.index==currCarIndex){
+							car3.setActivation(true);
+							carsFound++;
+							//do other car 3 stuff
+						}
+					}
 					if(NumberOfC>1&&carsFound==2){
 						break;
 					}
-                                        else if(NumberOfC==1&&carsFound==1){
-                                            break;
-                                        }
+					else if(NumberOfC==1&&carsFound==1){
+						break;
+					}
 					else{
 						currCarIndex++;
 						if(currCarIndex>raceTrack.totalIndex)
@@ -463,97 +484,23 @@ public class Game extends StaticScreenGame {
 				}
 				else
 					car2.state=State.UP;
-                                if(NumberOfC>1){
-                                    car3.curSegment=car3Data.p1;
-                                    car3.elapsedTime=car3Data.runTime;
-                                    car3.lap=car3Data.lap;
-                                    if(car3Data.state==1){
-                                            car3.state=State.DOWN;
-                                    }
-                                    else if(car3Data.state==2){
-                                            car3.state=State.STRAIGHT;
-                                    }
-                                    else
-                                            car3.state=State.UP;
-                                    Positioning(car1,car2,car3,np2[0].p1,car2.curSegment,car3.curSegment);
-                                }
-                                else{
-                                    doPos(car1,car2,np2[0].p1,car2.curSegment);
-                                }
-				//
-				/*
-				p1=GameNet.reciveData();
-				car2Dist=p1.carDist;
-				p2=new carS();
-				p2.p1=raceTrack.findSegment(raceTrack.curZpos+raceTrack.carZ);
-				j=p2.p1.index;
-				k=p1.p1.index+1;
-				k2=p1.p1.index;
-				p2.lap=car1.lap;
-				p2.runTime=car1.elapsedTime;
-				if(car1.state==State.DOWN){
-					p2.state=1;
-				}
-				else if(car1.state==State.STRAIGHT){
-					p2.state=2;
-				}
-				else
-					p2.state=3;
-				p2.carDist=car1.getPosition().getY()-p1.p1.lowerScreenY;
-				car1Dist=p2.carDist;
-				GameNet.sendData(p2);
-				car2.setActivation(false);
-				for(int i=0;i<raceTrack.drawDistance-30;i++){
-					if(j==k2){
-						segOrg=raceTrack.track.segments.get(j);
-
-						//System.out.println(p1.p1.index+","+j);
-						car2.setActivation(true);
-
-						calcX=car2.startPos.getX()-p1.p1.lowerScreenX;
-						//System.out.println(segOrg.lowerScreenX);
-						double pp=(segOrg.upperScreenX+segOrg.upperScreenW-segOrg.lowerScreenX+segOrg.lowerScreenW);
-						double ppp=(p2.p1.upperScreenX+p2.p1.upperScreenW-p2.p1.lowerScreenX+p2.p1.lowerScreenW);
-						calcX=calcX*(pp/ppp);
-						car2.scal2H=(segOrg.grassRight-segOrg.grassLeft)/(p2.p1.grassRight-p2.p1.grassLeft);
-						car2.currWidth=(int)(car2.getWidth()*car2.scal2H);
-						car2.currHeight=(int)(car2.getHeight()*car2.scal2H);
-						//car2.setPosition(new Vector2D(segOrg.lowerScreenX,car2.startPos.getY()));
-						if(calcX<0)
-							car2.setCenterPosition(new Vector2D(segOrg.lowerScreenX+calcX+car2.getWidth()/2,segOrg.lowerScreenY-car2.currHeight));
-						else
-							car2.setCenterPosition(new Vector2D(segOrg.lowerScreenX+calcX+car2.getWidth()/2,segOrg.lowerScreenY-car2.currHeight));
-						//will use segment resizing factor to determine car resizing
-
-
-						//car2.scal2W=segOrg.lowerScreenW/p2.p1.lowerScreenW;
-						break;
+				if(NumberOfC>1){
+					car3.curSegment=car3Data.p1;
+					car3.elapsedTime=car3Data.runTime;
+					car3.lap=car3Data.lap;
+					if(car3Data.state==1){
+						car3.state=State.DOWN;
 					}
-					else{
-						j++;
-						if(j>raceTrack.totalIndex){
-							j=0;
-						}
+					else if(car3Data.state==2){
+						car3.state=State.STRAIGHT;
 					}
+					else
+						car3.state=State.UP;
+					Positioning(car1,car2,car3,np2[0].p1,car2.curSegment,car3.curSegment);
 				}
-
-				car2.curSegment=p1.p1;
-				car2.elapsedTime=p1.runTime;
-				car2.lap=p1.lap;
-				if(p1.state==1){
-					car2.state=State.DOWN;
+				else{
+					doPos(car1,car2,np2[0].p1,car2.curSegment);
 				}
-				else if(p1.state==2){
-					car2.state=State.STRAIGHT;
-				}
-				else
-					car2.state=State.UP;
-				car2.curSegment=segOrg;
-				//finding postion use lap numbe first
-
-                                doPos(car1,car2,p2.p1,car2.curSegment);
-				//carRoad.roadCenter=p1.p1.roadCenter;
-				 */
 
 			}
 			else{
@@ -576,28 +523,28 @@ public class Game extends StaticScreenGame {
 				np1[0].carNum=carNum;
 				GameNet.sendData(np1[0]);
 				np2[0]=GameNet.reciveData();
-                                if(NumberOfC>1){
-                                    np2[1]=GameNet.reciveData();
-                                }
+				if(NumberOfC>1){
+					np2[1]=GameNet.reciveData();
+				}
 				otherCar1.setActivation(false);
 				otherCar2.setActivation(false);
 				carS other1Data;      
 				carS other2Data;
-                                other2Data=new carS();
+				other2Data=new carS();
 				int carsFound=0;
-                                if(NumberOfC>1){
-                                    if(np2[0].carNum<np2[1].carNum){
-                                            other1Data=np2[0];
-                                            other2Data=np2[1];
-                                    }
-                                    else{
-                                            other1Data=np2[1];
-                                            other2Data=np2[0];
-                                    }
-                                }
-                                else{
-                                    other1Data=np2[0];
-                                }
+				if(NumberOfC>1){
+					if(np2[0].carNum<np2[1].carNum){
+						other1Data=np2[0];
+						other2Data=np2[1];
+					}
+					else{
+						other1Data=np2[1];
+						other2Data=np2[0];
+					}
+				}
+				else{
+					other1Data=np2[0];
+				}
 				int currCarIndex=np1[0].p1.index;
 				for(int i=0;i<raceTrack.drawDistance;i++){
 					if(other1Data.p1.index==currCarIndex){
@@ -605,19 +552,19 @@ public class Game extends StaticScreenGame {
 						carsFound++;
 						//do ofther car2 stuff
 					}
-                                        if(NumberOfC>1){
-                                            if(other2Data.p1.index==currCarIndex){
-                                                    otherCar2.setActivation(true);
-                                                    carsFound++;
-                                                    //do other car 3 stuff
-                                            }
-                                        }
+					if(NumberOfC>1){
+						if(other2Data.p1.index==currCarIndex){
+							otherCar2.setActivation(true);
+							carsFound++;
+							//do other car 3 stuff
+						}
+					}
 					if(NumberOfC>1&&carsFound==2){
 						break;
 					}
-                                        else if(NumberOfC==1&&carsFound==1){
-                                            break;
-                                        }
+					else if(NumberOfC==1&&carsFound==1){
+						break;
+					}
 					else{
 						currCarIndex++;
 						if(currCarIndex>raceTrack.totalIndex)
@@ -635,106 +582,25 @@ public class Game extends StaticScreenGame {
 				}
 				else
 					otherCar1.state=State.UP;
-                                if(NumberOfC>1){
-                                    otherCar2.curSegment=other2Data.p1;
-                                    otherCar2.elapsedTime=other2Data.runTime;
-                                    otherCar2.lap=other2Data.lap;
-                                    if(other2Data.state==1){
-                                            otherCar2.state=State.DOWN;
-                                    }
-                                    else if(other2Data.state==2){
-                                            otherCar2.state=State.STRAIGHT;
-                                    }
-                                    else
-                                            otherCar2.state=State.UP;
-                                    //DO positioning
-                                    Positioning(TrueCar,otherCar1,otherCar2,np1[0].p1,otherCar1.curSegment,otherCar2.curSegment);
-                                }
-                                else{
-                                    doPos(car1,car2,car1.curSegment,np1[0].p1);
-                                }
-			}
-			//
-			/*
-				//send ovet all needed data
-				p1=new carS();
-				p1.p1=raceTrack.findSegment(raceTrack.curZpos+raceTrack.carZ);
-				p1.lap=car2.lap;
-				p1.runTime=car2.elapsedTime;
-				if(car2.state==State.DOWN){
-					p1.state=1;
-				}
-				else if(car2.state==State.STRAIGHT){
-					p1.state=2;
-				}
-				else
-					p1.state=3;
-				p1.carDist=car2.getPosition().getY()-p1.p1.lowerScreenY;
-				car2Dist=p1.carDist;
-				GameNet.sendData(p1);
-				p2=GameNet.reciveData();
-				car1Dist=p2.carDist;
-				j=p1.p1.index;
-				k=p2.p1.index+1;
-				k2=p2.p1.index;
-				car1.setActivation(false);
-				//go through all visable segments to find if car is on one
-				for(int i=0;i<raceTrack.drawDistance-30;i++){
-					if(j==k2){
-						//segment indexes match, so we grab the segment
-						segOrg=raceTrack.track.segments.get(j);
-						car1.setActivation(true);
-
-						//calculate the x distance travel on other cars screen
-						calcX=car1.startPos.getX()-p2.p1.lowerScreenX;
-
-						//get lenght of segment car will be put one
-						double pp=(segOrg.upperScreenX+segOrg.upperScreenW-segOrg.lowerScreenX+segOrg.lowerScreenW);
-						//get length of orginal segment
-						double ppp=(p2.p1.upperScreenX+p2.p1.upperScreenW-p2.p1.lowerScreenX+p2.p1.lowerScreenW);
-
-						//times x distance by ratio to get actual distance the car will travel on the new segment
-						calcX=calcX*(pp/ppp);
-						car1.scal2H=(segOrg.grassRight-segOrg.grassLeft)/(p2.p1.grassRight-p2.p1.grassLeft);
-						car1.currWidth=(int)(car1.getWidth()*car1.scal2H);
-						car1.currHeight=(int)(car1.getHeight()*car1.scal2H);
-						//if calcX< o car is to the left of x mid, else its to the right
-						if(calcX<0)
-							car1.setCenterPosition(new Vector2D(segOrg.lowerScreenX+calcX+car1.getWidth()/2,segOrg.lowerScreenY-car1.currHeight));
-						else
-							car1.setCenterPosition(new Vector2D(segOrg.lowerScreenX+calcX+car1.getWidth()/2,segOrg.lowerScreenY-car1.currHeight));
-
-
-						//car1.scal2W=segOrg.lowerScreenW/p1.p1.lowerScreenW;
-						//System.out.println(car1.scal2H+","+car2.scal2W);
-						break;
+				if(NumberOfC>1){
+					otherCar2.curSegment=other2Data.p1;
+					otherCar2.elapsedTime=other2Data.runTime;
+					otherCar2.lap=other2Data.lap;
+					if(other2Data.state==1){
+						otherCar2.state=State.DOWN;
 					}
-					else{
-						j++;
-						if(j>raceTrack.totalIndex){
-							j=0;
-						}
+					else if(other2Data.state==2){
+						otherCar2.state=State.STRAIGHT;
 					}
+					else
+						otherCar2.state=State.UP;
+					//DO positioning
+					Positioning(TrueCar,otherCar1,otherCar2,np1[0].p1,otherCar1.curSegment,otherCar2.curSegment);
 				}
-				//set car1 values what we got
-				car1.curSegment=p2.p1;
-				car1.elapsedTime=p2.runTime;
-				car1.lap=p2.lap;
-				if(p2.state==1){
-					car1.state=State.DOWN;
+				else{
+					doPos(car1,car2,car1.curSegment,np1[0].p1);
 				}
-				else if(p2.state==2){
-					car1.state=State.STRAIGHT;
-				}
-				else
-					car1.state=State.UP;
-				car1.curSegment=segOrg;
-
-				doPos(car1,car2,car1.curSegment,p1.p1)
-
-
 			}
-			 */
 		}
 
 		car1Pos = car1.getPosition();
@@ -955,9 +821,9 @@ public class Game extends StaticScreenGame {
 	}
 
 	public void CollisionHandlers(long deltaMs) {
-		checkCollisions.registerCollisionHandler(hitRumbles);
-		checkCollisions.registerCollisionHandler(hitGrass);
-		//checkCollisions.applyLawsOfPhysics(deltaMs);
+		checkCollisions.registerCollisionHandler(hitSpeedBoost);
+		//checkCollisions.registerCollisionHandler(hitOffroadObject);
+		checkCollisions.applyLawsOfPhysics(deltaMs);
 	}
 
 	public static void main(String[] args) {

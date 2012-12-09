@@ -13,21 +13,16 @@ import jig.engine.util.Vector2D;
 
 public class OffroadObjects extends VanillaAARectangle{
 
-	RaceTrack raceTrack;
-	RoadSegment segment;
 	double xPos;
 	double yPos;
 	double scaleFactor = 1;
 	int locationIndex;
 	boolean leftSide = false;
 	ArrayList<PolyHolder> road;
-	PolyHolder ph;
+
 
 	public OffroadObjects(String sprite, RaceTrack rt, int i, boolean b) {
 		super(sprite);
-		// TODO Auto-generated constructor stub
-		//System.out.println(" obj sprite"+sprite);
-		raceTrack = rt;
 		locationIndex = i;
 		leftSide = b;
 		active = false;

@@ -107,7 +107,6 @@ public class Car extends VanillaAARectangle {
 		
 		if (setFire) updateFire(rc);
 		if (setSmoke) updateSmoke(rc);
-		//updateSmoke(rc);
 		if (offRoad) updateOffroad(rc);
 		
 	}
