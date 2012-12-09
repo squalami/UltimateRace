@@ -70,7 +70,8 @@ public class Game extends StaticScreenGame {
 
 	CarHitSpeedBoost hitSpeedBoost;
 	CarHitOffroadObjects hitOffroadObject;
-	
+	CarHitCar carHit1;
+        CarHitCar carHit2;
 	static Vector2D car1Pos;   // used for network race track update
 	static Vector2D car2Pos;
 
@@ -353,31 +354,42 @@ public class Game extends StaticScreenGame {
 				gameObjectLayers.add(new GameUI(car1));
 				hitSpeedBoost = new CarHitSpeedBoost(car1,boostLayer,raceTrack);
 				hitOffroadObject = new CarHitOffroadObjects(car1,offroadLayer,raceTrack);
+                                carHit1=new CarHitCar(car1,car2,raceTrack);
+                                if(NumberOfC>1){
+                                    carHit2=new CarHitCar(car1,car3,raceTrack);
+                                }
 			} else {
 
 				if(carNum==2) {
 					gameObjectLayers.add(new GameUI(car2));
 					hitSpeedBoost = new CarHitSpeedBoost(car2,boostLayer,raceTrack);
 					hitOffroadObject = new CarHitOffroadObjects(car2,offroadLayer,raceTrack);
+                                        carHit1=new CarHitCar(car2,car1,raceTrack);
+                                        if(NumberOfC>1){
+                                            carHit2=new CarHitCar(car2,car3,raceTrack);
+                                        }
 
 				}
 				else if(carNum==3) {
 					gameObjectLayers.add(new GameUI(car3));
 					hitSpeedBoost = new CarHitSpeedBoost(car3,boostLayer,raceTrack);
 					hitOffroadObject = new CarHitOffroadObjects(car3,offroadLayer,raceTrack);
+                                        carHit1=new CarHitCar(car3,car1,raceTrack);
+                                        carHit2=new CarHitCar(car3,car2,raceTrack);
 
 				}
 				else {
 					gameObjectLayers.add(new GameUI(car2));
 					hitSpeedBoost = new CarHitSpeedBoost(car2,boostLayer,raceTrack);
 					hitOffroadObject = new CarHitOffroadObjects(car2,offroadLayer,raceTrack);
+                                        carHit1=new CarHitCar(car2,car1,raceTrack);
 				}
 			}
 		} else {
 			gameObjectLayers.add(new GameUI(car1));
 			hitSpeedBoost = new CarHitSpeedBoost(car1,boostLayer,raceTrack);
 			hitOffroadObject = new CarHitOffroadObjects(car1,offroadLayer,raceTrack);
-
+                        carHit1=new CarHitCar(car1,car2,raceTrack);
 		}
 
 	}
