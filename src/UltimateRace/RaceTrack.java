@@ -49,6 +49,7 @@ public class RaceTrack extends VanillaAARectangle {
 	double maxSpeed = 5; 
 	double curMaxSpeed = maxSpeed;
 	double offRoadDecel   = -maxSpeed/2;     
+	double dx;
 
 	BuildTrack track;
 	Vector2D carPos, carPrePos;
@@ -71,6 +72,7 @@ public class RaceTrack extends VanillaAARectangle {
 
 	boolean hitGrass = false;
 	boolean hitRumble = false;
+	boolean carHitObject = false;
 	Road Rd;
 
 	ArrayList<PolyHolder> grasses;
@@ -87,8 +89,8 @@ public class RaceTrack extends VanillaAARectangle {
 	AudioStream skid;
 	AudioStream standRevup;
 	AudioStream boostUp;
-	
-	public enum roadObject { Cactus, Billboard, Stone1, Stone2, Bush, Tree1, Tree2, Tree3, Stump }
+	RoadSegment baseSegment;
+	RoadSegment carSegment;
 
 	public RaceTrack(String sprite, GameFrame gameframe, Car car, Grass g, Road rd, Rumbles r) {
 		super(sprite);
@@ -123,10 +125,15 @@ public class RaceTrack extends VanillaAARectangle {
 
 	@Override
 	public void update(long deltaMs) {
-		double dx = 0.005;
-		double preCarX = carX;
+		if (car.speed < 0.7) 
+			dx = 0.005;
+		else
+			dx = 0.002 * (car.speed * 10);  
+		
+		double preCarX = carX;		
 		time++;
 		curIndex = Rd.curIndex;
+		
 		if (startFireTimer) {
 			fireTimerCount++;
 		}	
@@ -174,7 +181,7 @@ public class RaceTrack extends VanillaAARectangle {
 			         || boostUp.getState() == AudioState.STOPPED){
 					boostUp.loop(1.5,medLoop);
 				}
-				if (car.speed < curMaxSpeed) car.speed += 0.005;
+				if (car.speed < curMaxSpeed) car.speed += 0.002;
 				if (fireTimerCount >= fireTimer) {
 					fireTimerCount = 0;
 					startFireTimer = false;
@@ -185,6 +192,7 @@ public class RaceTrack extends VanillaAARectangle {
 			}
 
 			else if (car.speed < curMaxSpeed) {
+				
 				if (car.speed < 1.3) {
 				    car.speed += 0.001;
 				} else if (car.speed >= 1.3 && car.speed < 2.5) {
@@ -220,7 +228,7 @@ public class RaceTrack extends VanillaAARectangle {
 					}
 				}
 			} else {
-				if (car.speed > 0.4) {
+				if (car.speed > 0.7) {
 					revup.pause();
 					if (full.getState() == AudioState.PAUSED )
 						full.resume();
@@ -228,11 +236,16 @@ public class RaceTrack extends VanillaAARectangle {
 						full.loop(2,bigLoop);
 				} 
 			}
-
+			
 		} else if (Game.applybreak) {
 			if (car.speed > 0) car.speed *= 0.1;
 		} else {
-			car.speed *= 0.98;
+			
+			if (boostUp.getState() == AudioState.PLAYING) 
+				boostUp.pause();
+			
+			car.speed *= 0.99;
+			
 			if (car.speed > 0.05) {
 				full.pause();
 				revup.pause();
@@ -363,6 +376,16 @@ public class RaceTrack extends VanillaAARectangle {
 			skid.pause();
 		}
 
+		if (carHitObject) {
+			car.speed = -(car.speed * 1.5);
+			crash.play(2.5);
+			if (car.getPosition().getX() < road.get(0).xL) 
+				carX = carX + 7*dx + (7*dx * car.speed *centrifugal);
+			else
+				carX = carX - (7*dx) - (7*dx * car.speed * centrifugal);
+			car.speed = 0;
+			carHitObject = false;
+		}
 	}
 
  	@Override
@@ -379,8 +402,8 @@ public class RaceTrack extends VanillaAARectangle {
 
 	public void updateTrack() {
 
-		RoadSegment baseSegment = findSegment(curZpos);
-		RoadSegment carSegment = findSegment(curZpos+carZ);
+		baseSegment = findSegment(curZpos);
+		carSegment = findSegment(curZpos+carZ);
 
 		double basePercent = percentRemaining(curZpos, segmentLength);
 		double carPercent = percentRemaining(curZpos+carZ,segmentLength);

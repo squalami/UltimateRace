@@ -43,7 +43,7 @@ public class OffroadObjects extends VanillaAARectangle{
 			
 			if (locationIndex >= bi && locationIndex <= ti) {
 				
-				double dn = road.get(0).w * 0.2;
+				double dn = road.get(7).w;
 				double ws = this.getWidth();
 				for (PolyHolder p: road) {
 					

@@ -9,7 +9,6 @@ package UltimateRace;
  * @author brian
  */
 import java.awt.geom.Rectangle2D;
-import jig.engine.physics.BodyLayer;
 import jig.engine.physics.vpe.CollisionHandler;
 
 

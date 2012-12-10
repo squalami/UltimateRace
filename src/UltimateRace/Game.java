@@ -71,7 +71,7 @@ public class Game extends StaticScreenGame {
 	CarHitSpeedBoost hitSpeedBoost;
 	CarHitOffroadObjects hitOffroadObject;
 	CarHitCar carHit1;
-        CarHitCar carHit2;
+	CarHitCar carHit2;
 	static Vector2D car1Pos;   // used for network race track update
 	static Vector2D car2Pos;
 
@@ -242,7 +242,7 @@ public class Game extends StaticScreenGame {
 		physics.manageViewableSet(car2Layer);
 		gameObjectLayers.add(car3Layer);
 		physics.manageViewableSet(car3Layer);
-		
+
 		for (int i=115; i < raceTrack.totalIndex - 150; ) {
 			if (BuildTrack.curChk.containsKey(i) && !BuildTrack.curChk.get(i)) {
 				boost = new SpeedBoost(SPRITE_SHEET + "#boost", raceTrack,i);
@@ -258,7 +258,7 @@ public class Game extends StaticScreenGame {
 			if (BuildTrack.curChk.containsKey(i) && !BuildTrack.curChk.get(i)) {
 				tree1 = new OffroadObjects(SPRITE_SHEET+"#tree1",raceTrack,i,false);
 				offroadLayer.add(tree1);
-				tree2 = new OffroadObjects(SPRITE_SHEET+"#tree2",raceTrack,i,true);
+				tree1 = new OffroadObjects(SPRITE_SHEET+"#tree2",raceTrack,i,true);
 				offroadLayer.add(tree1);
 				i += repeat;
 			}
@@ -282,11 +282,32 @@ public class Game extends StaticScreenGame {
 				offroadLayer.add(tree2);
 				i += repeat;
 			}
+			if (BuildTrack.curChk.containsKey(i) && !BuildTrack.curChk.get(i)) {				
+				tree1 = new OffroadObjects(SPRITE_SHEET+"#tree1",raceTrack,i,false);
+				offroadLayer.add(tree1);
+				tree1 = new OffroadObjects(SPRITE_SHEET+"#tree1",raceTrack,i,true);
+				offroadLayer.add(tree1);
+				i += repeat;
+			}
 			if (BuildTrack.curChk.containsKey(i) && !BuildTrack.curChk.get(i)) {
-				tree3 = new OffroadObjects(SPRITE_SHEET+"#tree3",raceTrack,i,true);
-				offroadLayer.add(tree3);
-				tree3 = new OffroadObjects(SPRITE_SHEET+"#tree3",raceTrack,i,false);
-				offroadLayer.add(tree3);
+				tree2 = new OffroadObjects(SPRITE_SHEET+"#tree2",raceTrack,i,false);
+				offroadLayer.add(tree2);
+				tree2 = new OffroadObjects(SPRITE_SHEET+"#tree2",raceTrack,i,true);
+				offroadLayer.add(tree2);
+				i += repeat;
+			}
+			if (BuildTrack.curChk.containsKey(i) && !BuildTrack.curChk.get(i)) {				
+				tree1 = new OffroadObjects(SPRITE_SHEET+"#tree1",raceTrack,i,false);
+				offroadLayer.add(tree1);
+				tree1 = new OffroadObjects(SPRITE_SHEET+"#tree1",raceTrack,i,true);
+				offroadLayer.add(tree1);
+				i += repeat;
+			}
+			if (BuildTrack.curChk.containsKey(i) && !BuildTrack.curChk.get(i)) {
+				tree2 = new OffroadObjects(SPRITE_SHEET+"#tree2",raceTrack,i,false);
+				offroadLayer.add(tree2);
+				tree2 = new OffroadObjects(SPRITE_SHEET+"#tree2",raceTrack,i,true);
+				offroadLayer.add(tree2);
 				i += repeat;
 			}
 			if (BuildTrack.curChk.containsKey(i) && !BuildTrack.curChk.get(i)) {
@@ -319,14 +340,6 @@ public class Game extends StaticScreenGame {
 				i += repeat;
 			}
 			if (BuildTrack.curChk.containsKey(i) && !BuildTrack.curChk.get(i)) {
-				tree3 = new OffroadObjects(SPRITE_SHEET+"#tree3",raceTrack,i,true);
-				offroadLayer.add(tree3);
-				tree3 = new OffroadObjects(SPRITE_SHEET+"#tree3",raceTrack,i,false);
-				offroadLayer.add(tree3);
-				i += repeat;
-
-			}
-			if (BuildTrack.curChk.containsKey(i) && !BuildTrack.curChk.get(i)) {
 				billboard = new OffroadObjects(SPRITE_SHEET+"#billboard",raceTrack,i,true);
 				offroadLayer.add(billboard);
 				i += repeat;
@@ -354,42 +367,42 @@ public class Game extends StaticScreenGame {
 				gameObjectLayers.add(new GameUI(car1));
 				hitSpeedBoost = new CarHitSpeedBoost(car1,boostLayer,raceTrack);
 				hitOffroadObject = new CarHitOffroadObjects(car1,offroadLayer,raceTrack);
-                                carHit1=new CarHitCar(car1,car2,raceTrack);
-                                if(NumberOfC>1){
-                                    carHit2=new CarHitCar(car1,car3,raceTrack);
-                                }
+				carHit1=new CarHitCar(car1,car2,raceTrack);
+				if(NumberOfC>1){
+					carHit2=new CarHitCar(car1,car3,raceTrack);
+				}
 			} else {
 
 				if(carNum==2) {
 					gameObjectLayers.add(new GameUI(car2));
 					hitSpeedBoost = new CarHitSpeedBoost(car2,boostLayer,raceTrack);
 					hitOffroadObject = new CarHitOffroadObjects(car2,offroadLayer,raceTrack);
-                                        carHit1=new CarHitCar(car2,car1,raceTrack);
-                                        if(NumberOfC>1){
-                                            carHit2=new CarHitCar(car2,car3,raceTrack);
-                                        }
+					carHit1=new CarHitCar(car2,car1,raceTrack);
+					if(NumberOfC>1){
+						carHit2=new CarHitCar(car2,car3,raceTrack);
+					}
 
 				}
 				else if(carNum==3) {
 					gameObjectLayers.add(new GameUI(car3));
 					hitSpeedBoost = new CarHitSpeedBoost(car3,boostLayer,raceTrack);
 					hitOffroadObject = new CarHitOffroadObjects(car3,offroadLayer,raceTrack);
-                                        carHit1=new CarHitCar(car3,car1,raceTrack);
-                                        carHit2=new CarHitCar(car3,car2,raceTrack);
+					carHit1=new CarHitCar(car3,car1,raceTrack);
+					carHit2=new CarHitCar(car3,car2,raceTrack);
 
 				}
 				else {
 					gameObjectLayers.add(new GameUI(car2));
 					hitSpeedBoost = new CarHitSpeedBoost(car2,boostLayer,raceTrack);
 					hitOffroadObject = new CarHitOffroadObjects(car2,offroadLayer,raceTrack);
-                                        carHit1=new CarHitCar(car2,car1,raceTrack);
+					carHit1=new CarHitCar(car2,car1,raceTrack);
 				}
 			}
 		} else {
 			gameObjectLayers.add(new GameUI(car1));
 			hitSpeedBoost = new CarHitSpeedBoost(car1,boostLayer,raceTrack);
 			hitOffroadObject = new CarHitOffroadObjects(car1,offroadLayer,raceTrack);
-                        carHit1=new CarHitCar(car1,car2,raceTrack);
+			carHit1=new CarHitCar(car1,car2,raceTrack);
 		}
 
 	}
@@ -834,7 +847,7 @@ public class Game extends StaticScreenGame {
 
 	public void CollisionHandlers(long deltaMs) {
 		checkCollisions.registerCollisionHandler(hitSpeedBoost);
-		//checkCollisions.registerCollisionHandler(hitOffroadObject);
+		checkCollisions.registerCollisionHandler(hitOffroadObject);
 		checkCollisions.applyLawsOfPhysics(deltaMs);
 	}
 

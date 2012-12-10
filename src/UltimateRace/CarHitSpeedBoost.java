@@ -12,7 +12,6 @@ public class CarHitSpeedBoost implements CollisionHandler {
 	BodyLayer<SpeedBoost> boostLayer;
 	SpeedBoost booster;
 	ArrayList<PolyHolder> road;
-	int locationIndex;
 	Rectangle sbRec;
 
 
@@ -25,8 +24,6 @@ public class CarHitSpeedBoost implements CollisionHandler {
 	
 	@Override
 	public void findAndReconcileCollisions() {
-		// TODO Auto-generated method stub
-        //System.out.println("booster size:"+boostLayer.size());
 		for(int i=0; i < boostLayer.size(); i++) {
 			booster = boostLayer.get(i);
 			if (booster.isActive()) {
