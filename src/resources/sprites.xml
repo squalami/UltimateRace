@@ -140,11 +140,11 @@
      </frameset>
      
       <frameset>
-        <name>stone1</name>
+        <name>oil</name>
         <top>280</top>
-        <left>552</left>
-        <width>72</width>
-        <height>120</height>
+        <left>560</left>
+        <width>64</width>
+        <height>96</height>
      </frameset>
 
       <frameset>

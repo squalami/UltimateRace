@@ -7,56 +7,74 @@ package UltimateRace;
 /**
  *
  * @author brian
+ * mod by F.Doan
  */
 import java.awt.geom.Rectangle2D;
 import jig.engine.physics.vpe.CollisionHandler;
 
 
 public class CarHitCar implements CollisionHandler {
-    Car car1;
-    Car car2;
-    double dx = 0.005;
-    double centrifugal  = 0.3;   
-    RaceTrack track;
-    
-    public CarHitCar(Car c1, Car c2,RaceTrack r1){
-        car1=c1;
-        car2=c2;
-        track=r1;
-    }
-    @Override
-    public void findAndReconcileCollisions() {
-       Rectangle2D car1Box=car1.getBoundingBox();
-       Rectangle2D car2Box=car2.getBoundingBox();
-       if(car2.isActive()){
-            if(car1Box.intersects(car2Box)){
-                //determine if the which direction the car will be pushed
-                if(car1.getPosition().getX()<car2.getPosition().getX()){
-                    track.carX=track.carX - dx - (dx * car1.speed * centrifugal);
-                }
-                else if(car1.getPosition().getX()>car2.getPosition().getX()){
-                    track.carX=track.carX+dx+(dx*car1.speed*centrifugal);
-                }
-                else{
-                    double p=Math.random();
-                    if(p>.5){
-                        track.carX=track.carX - dx - (dx * car1.speed * centrifugal);
-                    }
-                    else{
-                         track.carX=track.carX+dx+(dx*car1.speed*centrifugal);
-                    }
-                }
-                if(car1.getPosition().getY()>car2.getPosition().getY()){
-                    car1.speed=car1.speed+0.005;
-                }
-                else{
-                    car1.speed=car1.speed-0.005;
-                    if(car1.speed<0){
-                        car1.speed=0;
-                    }
-                }
-           }
-       }
-    }
-    
+	Car car1;
+	Car car2;
+	double cx1;
+	double cy1;
+	double cx2;
+	double cy2;
+
+	public CarHitCar(Car c1, Car c2){
+		car1=c1;
+		car2=c2;
+	}
+	@Override
+	public void findAndReconcileCollisions() {
+		if(car1.isActive() && car2.isActive()){
+			Rectangle2D car1Box=car1.getBoundingBox();
+			Rectangle2D car2Box=car2.getBoundingBox();
+			if(car1Box.intersects(car2Box)){
+				car1.carCrash = true;
+				car2.carCrash = true;
+				//determine if the which direction the car will be pushed
+				cx1 = car1Box.getCenterX();
+				cy1 = car1Box.getCenterY();
+				cx2 = car2Box.getCenterX();
+				cy2 = car2Box.getCenterY();
+				if (cx1 < cx2) {
+					if (cy1 == cy2) {
+						car1.crashDir = Car.CrashDir.LEFT;
+						car2.crashDir = Car.CrashDir.RIGHT;
+					} else if (cy1 < cy2) {
+						car1.crashDir = Car.CrashDir.DOWNLEFT;
+						car2.crashDir = Car.CrashDir.UPRIGHT;
+					} else {
+						car1.crashDir = Car.CrashDir.UPLEFT;
+						car2.crashDir = Car.CrashDir.DOWNRIGHT;
+					}
+				} else if (cx1 == cx2) {
+					if (cy1 == cy2) {
+                        // should never happen?
+					} else if (cy1 < cy2) {
+						car1.crashDir = Car.CrashDir.UP;
+						car2.crashDir = Car.CrashDir.DOWN;
+					} else {
+						car1.crashDir = Car.CrashDir.DOWN;
+						car2.crashDir = Car.CrashDir.UP;
+					}
+
+				} else { // cx1 > cx2
+					if (cy1 == cy2) {
+						car2.crashDir = Car.CrashDir.LEFT;
+						car1.crashDir = Car.CrashDir.RIGHT;
+					} else if (cy1 < cy2) {
+						car2.crashDir = Car.CrashDir.DOWNLEFT;
+						car1.crashDir = Car.CrashDir.UPRIGHT;
+					} else {
+						car2.crashDir = Car.CrashDir.UPLEFT;
+						car1.crashDir = Car.CrashDir.DOWNRIGHT;
+					}
+				}
+
+			}
+		}
+	}
+
 }

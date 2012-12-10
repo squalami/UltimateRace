@@ -1,4 +1,7 @@
 package UltimateRace;
+/**
+ * F.Doan
+ */
 
 import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
@@ -6,8 +9,8 @@ import jig.engine.RenderingContext;
 import jig.engine.physics.vpe.VanillaAARectangle;
 import jig.engine.util.Vector2D;
 
-public class SpeedBoost extends VanillaAARectangle{
-
+public class Oil extends VanillaAARectangle{
+	
 	double xPos;
 	double yPos;
 	double scaleFactor = 1;
@@ -15,7 +18,8 @@ public class SpeedBoost extends VanillaAARectangle{
 	int roadPos = 0;
 	ArrayList<PolyHolder> road;
 
-	public SpeedBoost(String sprite, RaceTrack rt, int i, int p) {
+
+	public Oil(String sprite, RaceTrack rt, int i, int p) {
 		super(sprite);
 		locationIndex = i;
 		active = false;
@@ -27,8 +31,7 @@ public class SpeedBoost extends VanillaAARectangle{
 
 	@Override
 	public void update(long deltaMs) {
-		updateObject();
-		
+		updateObject();		
 	}
 	
 	public void updateObject() {
@@ -45,8 +48,10 @@ public class SpeedBoost extends VanillaAARectangle{
 					if (locationIndex == p.segmentIndex) {
 						scaleFactor = p.w /dn;
 						yPos = p.yB;
-						if (roadPos > 1) xPos = p.xR - (p.w/3);
-						else if (roadPos == 1) xPos = p.xL + p.w/3;
+						if (roadPos == 4) xPos = p.xR - (p.w/5);
+						else if (roadPos == 3) xPos = p.xL + p.w/4;
+						else if (roadPos == 2) xPos = p.xL + p.w/3;
+						else if (roadPos == 1) xPos = p.xL + p.w/5;
 						else xPos = p.xL + p.w/2;
 						active = true;
 						this.setCenterPosition(new Vector2D(xPos,yPos));
@@ -57,7 +62,6 @@ public class SpeedBoost extends VanillaAARectangle{
 				active = false;
 			}
 		}
-
 	}
 	
 	public void render(final RenderingContext rc) {

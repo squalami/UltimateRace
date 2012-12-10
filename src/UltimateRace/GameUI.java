@@ -67,15 +67,15 @@ public class GameUI implements ViewableLayer {
 			}
 			if (count2) {
 				n2.get(0).render(rc, 
-						AffineTransform.getTranslateInstance(X,Y));
+						AffineTransform.getTranslateInstance(X-7,Y));
 			}
 			if (count3) {
 				n3.get(0).render(rc, 
-						AffineTransform.getTranslateInstance(X,Y));
+						AffineTransform.getTranslateInstance(X-5,Y));
 			}
 			if (displayGo) {
 				go.get(0).render(rc, 
-						AffineTransform.getTranslateInstance(X,Y));				
+						AffineTransform.getTranslateInstance(X-15,Y));				
 			}
 		}
 

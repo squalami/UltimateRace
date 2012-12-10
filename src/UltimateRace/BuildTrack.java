@@ -33,8 +33,8 @@ public class BuildTrack {
 	
 	public void buildTrack() {
 		segments.clear();
-		curve = 2 * level;
-		hill  = 10 * level;
+		curve = 2 + level;
+		hill  = 10 + (level * 5);
 		
 		straightSegments(25);
 		curveSegments(35,35,0);

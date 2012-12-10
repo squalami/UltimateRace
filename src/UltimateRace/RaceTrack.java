@@ -74,6 +74,8 @@ public class RaceTrack extends VanillaAARectangle {
 	boolean hitGrass = false;
 	boolean hitRumble = false;
 	boolean carHitObject = false;
+	boolean skidOffright = false;
+	boolean skidOffleft = false;
 	Road Rd;
 
 	ArrayList<PolyHolder> grasses;
@@ -347,7 +349,11 @@ public class RaceTrack extends VanillaAARectangle {
 
 				} 
 
-				car.speed *= 0.98;
+				if (car.speed >= 0.7) {
+					car.speed -= 0.001;
+				} else if (car.speed < 0.7 && car.speed > 0.3) {
+					car.speed -= 0.0005;
+				}
 			}
 		}
 
@@ -401,11 +407,28 @@ public class RaceTrack extends VanillaAARectangle {
 			car.speed = -(car.speed * 1.5);
 			crash.play(2.5);
 			if (car.getPosition().getX() < road.get(0).xL) 
-				carX = carX + 7*dx + (7*dx * car.speed *centrifugal);
+				carX = carX + 5*dx + (7*dx * car.speed *centrifugal);
 			else
-				carX = carX - (7*dx) - (7*dx * car.speed * centrifugal);
+				carX = carX - (5*dx) - (7*dx * car.speed * centrifugal);
 			car.speed = 0;
 			carHitObject = false;
+		}
+		
+		if (skidOffleft) {
+			car.speed *= 0.9;
+			carX = carX - 5*dx - (27*dx * car.speed *centrifugal);
+			if (skid.getState() == AudioState.PAUSED)
+				skid.resume();
+			car.setSmoke = true;
+			skidOffleft = false;
+		}
+		if (skidOffright) {
+			car.speed *= 0.9;
+			carX = carX + 5*dx + (27*dx * car.speed *centrifugal);
+			if (skid.getState() == AudioState.PAUSED)
+				skid.resume();
+			car.setSmoke = true;
+			skidOffright = false;
 		}
 	}
 

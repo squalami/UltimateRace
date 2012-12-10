@@ -27,7 +27,7 @@ public class Game extends StaticScreenGame {
 	static final int WORLD_HEIGHT = 480;
 	static int level = 1;
 	static int maxLevel = 3;
-	static int lap2Win = 10;
+	static int lap2Win = 3;
 	static boolean turnLeft = false;
 	static boolean turnRight = false;
 	static boolean speedUp = false;
@@ -71,11 +71,13 @@ public class Game extends StaticScreenGame {
 	OffroadObjects tree1;
 	OffroadObjects tree2;
 	OffroadObjects stump;
+	Oil sleekOil;
 
 	CarHitSpeedBoost hitSpeedBoost;
 	CarHitOffroadObjects hitOffroadObject;
 	CarHitCar carHit1;
 	CarHitCar carHit2;
+	CarHitOil hitOil;
 	static Vector2D car1Pos;   // used for network race track update
 	static Vector2D car2Pos;
 
@@ -90,6 +92,7 @@ public class Game extends StaticScreenGame {
 	BodyLayer<Rumbles> rbLayer;
 	BodyLayer<SpeedBoost> boostLayer;
 	BodyLayer<OffroadObjects> offroadLayer;
+	BodyLayer<Oil> oilLayer;
 
 	BodyLayer<Background> backgroundLayer;
 	NetworkC GameNet;
@@ -135,6 +138,7 @@ public class Game extends StaticScreenGame {
 
 		offroadLayer = new AbstractBodyLayer.IterativeUpdate<OffroadObjects>();
 		boostLayer = new AbstractBodyLayer.IterativeUpdate<SpeedBoost>();
+		oilLayer =  new AbstractBodyLayer.IterativeUpdate<Oil>();
 
 		if(isNet){
 			//new multiplayer setup for more than 3 players
@@ -229,24 +233,38 @@ public class Game extends StaticScreenGame {
 		physics.manageViewableSet(grassLayer);
 
 		car1Layer = new AbstractBodyLayer.IterativeUpdate<Car>();
-		car1Layer.add(car1);		
-		car2Layer = new AbstractBodyLayer.IterativeUpdate<Car>();
-		car2Layer.add(car2);
-		car3Layer = new AbstractBodyLayer.IterativeUpdate<Car>();
-		car3Layer.add(car3);
-
+		car1Layer.add(car1);	
 		gameObjectLayers.add(car1Layer);
 		physics.manageViewableSet(car1Layer);
-		gameObjectLayers.add(car2Layer);
-		physics.manageViewableSet(car2Layer);
-		gameObjectLayers.add(car3Layer);
-		physics.manageViewableSet(car3Layer);
+		
+		if (isNet) {
+			car2Layer = new AbstractBodyLayer.IterativeUpdate<Car>();
+			car2Layer.add(car2);
+			gameObjectLayers.add(car2Layer);
+			physics.manageViewableSet(car2Layer);
+			car3Layer = new AbstractBodyLayer.IterativeUpdate<Car>();
+			car3Layer.add(car3);
+			gameObjectLayers.add(car3Layer);
+			physics.manageViewableSet(car3Layer);
+		}
 
-		for (int i=115; i < raceTrack.totalIndex - 150; ) {
+		for (int i=90; i < raceTrack.totalIndex - 150; ) {
+			int rd =  (int) (Math.random() * 25)%3;
 			if (BuildTrack.curChk.containsKey(i) && !BuildTrack.curChk.get(i)) {
-				boost = new SpeedBoost(SPRITE_SHEET + "#boost", raceTrack,i);
+				boost = new SpeedBoost(SPRITE_SHEET + "#boost", raceTrack,i,rd);
 				boostLayer.add(boost);
 				i += 350;
+			} else {
+				i++;
+			}			
+		}
+
+		for (int i=125; i < raceTrack.totalIndex - 150; ) {
+			int rd =  (int) (Math.random() * 25) % 5;
+			if (BuildTrack.curChk.containsKey(i) && !BuildTrack.curChk.get(i)) {
+				sleekOil = new Oil(SPRITE_SHEET + "#oil", raceTrack,i,rd);
+				oilLayer.add(sleekOil);
+				i += 180;
 			} else {
 				i++;
 			}			
@@ -360,48 +378,55 @@ public class Game extends StaticScreenGame {
 		physics.manageViewableSet(offroadLayer);
 		gameObjectLayers.add(boostLayer);
 		physics.manageViewableSet(boostLayer);
+		gameObjectLayers.add(oilLayer);
+		physics.manageViewableSet(oilLayer);
 
 		if (isNet) {
 			if (isServ) {
 				gameObjectLayers.add(new GameUI(car1));
+				hitOil = new CarHitOil(car1,oilLayer,raceTrack);
 				hitSpeedBoost = new CarHitSpeedBoost(car1,boostLayer,raceTrack);
 				hitOffroadObject = new CarHitOffroadObjects(car1,offroadLayer,raceTrack);
-				carHit1=new CarHitCar(car1,car2,raceTrack);
+				carHit1=new CarHitCar(car1,car2);
 				if(NumberOfC>1){
-					carHit2=new CarHitCar(car1,car3,raceTrack);
+					carHit2=new CarHitCar(car1,car3);
 				}
 			} else {
 
 				if(carNum==2) {
 					gameObjectLayers.add(new GameUI(car2));
+					hitOil = new CarHitOil(car2,oilLayer,raceTrack);
 					hitSpeedBoost = new CarHitSpeedBoost(car2,boostLayer,raceTrack);
 					hitOffroadObject = new CarHitOffroadObjects(car2,offroadLayer,raceTrack);
-					carHit1=new CarHitCar(car2,car1,raceTrack);
+					carHit1=new CarHitCar(car2,car1);
 					if(NumberOfC>1){
-						carHit2=new CarHitCar(car2,car3,raceTrack);
+						carHit2=new CarHitCar(car2,car3);
 					}
 
 				}
 				else if(carNum==3) {
 					gameObjectLayers.add(new GameUI(car3));
 					hitSpeedBoost = new CarHitSpeedBoost(car3,boostLayer,raceTrack);
+					hitOil = new CarHitOil(car3,oilLayer,raceTrack);
 					hitOffroadObject = new CarHitOffroadObjects(car3,offroadLayer,raceTrack);
-					carHit1=new CarHitCar(car3,car1,raceTrack);
-					carHit2=new CarHitCar(car3,car2,raceTrack);
+					carHit1=new CarHitCar(car3,car1);
+					carHit2=new CarHitCar(car3,car2);
 
 				}
 				else {
 					gameObjectLayers.add(new GameUI(car2));
+					hitOil = new CarHitOil(car2,oilLayer,raceTrack);
 					hitSpeedBoost = new CarHitSpeedBoost(car2,boostLayer,raceTrack);
 					hitOffroadObject = new CarHitOffroadObjects(car2,offroadLayer,raceTrack);
-					carHit1=new CarHitCar(car2,car1,raceTrack);
+					carHit1=new CarHitCar(car2,car1);
 				}
 			}
-		} else {
+		} else { // single player mode
 			gameObjectLayers.add(new GameUI(car1));
 			hitSpeedBoost = new CarHitSpeedBoost(car1,boostLayer,raceTrack);
+			hitOil = new CarHitOil(car1,oilLayer,raceTrack);
 			hitOffroadObject = new CarHitOffroadObjects(car1,offroadLayer,raceTrack);
-			//carHit1=new CarHitCar(car1,car2,raceTrack);
+
 		}
 
 	}
@@ -858,8 +883,15 @@ public class Game extends StaticScreenGame {
 	}
 
 	public void CollisionHandlers(long deltaMs) {
+		checkCollisions.registerCollisionHandler(hitOil);
 		checkCollisions.registerCollisionHandler(hitSpeedBoost);
 		checkCollisions.registerCollisionHandler(hitOffroadObject);
+		if (carHit1 != null) {
+			checkCollisions.registerCollisionHandler(carHit1);
+		}
+		if (carHit2 != null) {
+			checkCollisions.registerCollisionHandler(carHit2);
+		}
 		checkCollisions.applyLawsOfPhysics(deltaMs);
 	}
 

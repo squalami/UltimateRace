@@ -19,6 +19,9 @@ import jig.engine.util.Vector2D;
 public class Car extends VanillaAARectangle {
 
 	public enum State { STRAIGHT, UP, DOWN }
+	public static enum CrashDir { UP, UPLEFT, UPRIGHT, DOWN, DOWNLEFT, DOWNRIGHT, LEFT, RIGHT }
+	
+	public CrashDir crashDir;
 
 	double speed = 0;
 	Vector2D startPos;
@@ -40,6 +43,7 @@ public class Car extends VanillaAARectangle {
 	boolean offRoad = false;
 	boolean grassActive = false;
 	boolean isWin = false;
+	boolean carCrash = false;
 	
 	int RacePos = 1;
 	int currWidth;
