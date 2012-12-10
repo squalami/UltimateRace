@@ -39,6 +39,7 @@ public class Car extends VanillaAARectangle {
 	boolean setSmoke = false;
 	boolean offRoad = false;
 	boolean grassActive = false;
+	boolean isWin = false;
 	
 	int RacePos = 1;
 	int currWidth;
@@ -79,6 +80,19 @@ public class Car extends VanillaAARectangle {
 		updateFrames(deltaMs);
 		if (Game.gameIsRun) {
 			elapsedTime = (System.currentTimeMillis() - Game.iniTime)/1000;
+			if (lap > Game.lap2Win && RacePos == 1) {
+				isWin = true;
+				Game.gameIsRun = false;
+				Game.finishCurLevel = true;
+			}
+		}
+		if (Game.finishCurLevel) {
+			lap = 1;
+			RacePos = 1;
+			elapsedTime = 0;
+		}
+		if (Game.startGame) {
+			isWin = false;
 		}
 	}
 

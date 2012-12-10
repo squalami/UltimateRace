@@ -1,6 +1,9 @@
 package UltimateRace;
 /**
- * CS447/547 Project 2 by F.Doan
+ * CS447/547 Project 2 
+ * 
+ * by Fredton Doan, Brian Lamb & Perry Miller
+ * 
  * 
  */
 
@@ -16,8 +19,6 @@ import jig.engine.physics.vpe.VanillaPhysicsEngine;
 import jig.engine.util.Vector2D;
 import java.awt.event.KeyEvent;
 import java.util.Scanner;
-import jig.engine.audio.jsound.AudioClip;
-
 
 
 public class Game extends StaticScreenGame {
@@ -25,13 +26,19 @@ public class Game extends StaticScreenGame {
 	static final int WORLD_WIDTH = 640;
 	static final int WORLD_HEIGHT = 480;
 	static int level = 1;
+	static int maxLevel = 3;
+	static int lap2Win = 10;
 	static boolean turnLeft = false;
 	static boolean turnRight = false;
 	static boolean speedUp = false;
 	static boolean applybreak = false;
 	static boolean runUpdate = false;
 	static boolean gameIsRun = false;
+	static boolean startGame = false;
+	static boolean displayMenu = true;
 	static boolean standRevup = false;
+	static boolean finishCurLevel = false;
+	static boolean displayNextLevel = false;
 
 	static long iniTime = 0;
 
@@ -60,12 +67,9 @@ public class Game extends StaticScreenGame {
 	SpeedBoost boost;
 	OffroadObjects cactus;
 	OffroadObjects billboard;
-	OffroadObjects stone1;
-	OffroadObjects stone2;
 	OffroadObjects bush;
 	OffroadObjects tree1;
 	OffroadObjects tree2;
-	OffroadObjects tree3;
 	OffroadObjects stump;
 
 	CarHitSpeedBoost hitSpeedBoost;
@@ -96,12 +100,10 @@ public class Game extends StaticScreenGame {
 
 	VanillaPhysicsEngine checkCollisions = new VanillaPhysicsEngine();
 
-
 	public Game() {
 		super(WORLD_WIDTH, WORLD_HEIGHT, false);
 
 		physics = new VanillaPhysicsEngine();
-		//music = new AudioStream("resources/RhythmSphere3.mp3");
 		ResourceFactory.getFactory().loadSheet(SPRITE_SHEET, XMLFILE);
 
 		background = new Background(SPRITE_SHEET + "#background");
@@ -118,15 +120,12 @@ public class Game extends StaticScreenGame {
 				SPRITE_SHEET + "#fire",
 				SPRITE_SHEET + "#smoke",
 				SPRITE_SHEET + "#cutgrass");
-		car1Pos = car1.getPosition();
 
 		car2 = new Car(SPRITE_SHEET + "#greenCar",
 				new Vector2D((3*WORLD_WIDTH/4 - 200),WORLD_HEIGHT-70),
 				SPRITE_SHEET + "#fire",
 				SPRITE_SHEET + "#smoke",
 				SPRITE_SHEET + "#cutgrass");
-
-		car2Pos = car2.getPosition();
 
 		car3 = new Car(SPRITE_SHEET + "#orangeCar",
 				new Vector2D((3*WORLD_WIDTH/4 - 60),WORLD_HEIGHT-70),
@@ -402,20 +401,32 @@ public class Game extends StaticScreenGame {
 			gameObjectLayers.add(new GameUI(car1));
 			hitSpeedBoost = new CarHitSpeedBoost(car1,boostLayer,raceTrack);
 			hitOffroadObject = new CarHitOffroadObjects(car1,offroadLayer,raceTrack);
-			carHit1=new CarHitCar(car1,car2,raceTrack);
+			//carHit1=new CarHitCar(car1,car2,raceTrack);
 		}
 
 	}
 
+	public void resetGame() {
+		if (level < maxLevel) {
+			level++;
+		}
+		raceTrack.resetRaceTrack();
+	}
 
 	public void update(long deltaMs) {
 		super.update(deltaMs);
 
+		if (finishCurLevel) {
+			finishCurLevel = false;
+			resetGame();
+			displayNextLevel = true;
+		}
 		//new mulitplayer stuff
 		carS np1[]=new carS[2];
 		carS np2[]=new carS[2];
 
 		//normal 2 player stuff
+		/*
 		carS p1;
 		carS p2;
 		int j;
@@ -424,7 +435,8 @@ public class Game extends StaticScreenGame {
 		double car1Dist;
 		double car2Dist; 
 		double calcX;
-		RoadSegment segOrg=new RoadSegment(State.STRAIGHT,false);
+		RoadSegment segOrg = new RoadSegment(State.STRAIGHT,false);
+		//*/
 		if(isNet){
 			if(isServ){
 				//more than 1 car stuff
@@ -461,8 +473,8 @@ public class Game extends StaticScreenGame {
 				//start calcualtions
 				car2.setActivation(false);
 				car3.setActivation(false);
-				int car2Seg;
-				int car3Seg;
+				//int car2Seg;
+				//int car3Seg;
 				carS car2Data;      
 				carS car3Data;
 				car3Data=new carS();
@@ -473,7 +485,7 @@ public class Game extends StaticScreenGame {
 				}
 
 				int currCarIndex=np2[0].p1.index;
-				for(int i=0;i<raceTrack.drawDistance;i++){
+				for(int i=0;i<RaceTrack.drawDistance;i++){
 					if(car2Data.p1.index==currCarIndex){
 						car2.setActivation(true);
 						carsFound++;
@@ -571,7 +583,7 @@ public class Game extends StaticScreenGame {
 					other1Data=np2[0];
 				}
 				int currCarIndex=np1[0].p1.index;
-				for(int i=0;i<raceTrack.drawDistance;i++){
+				for(int i=0;i<RaceTrack.drawDistance;i++){
 					if(other1Data.p1.index==currCarIndex){
 						otherCar1.setActivation(true);
 						carsFound++;
@@ -628,16 +640,11 @@ public class Game extends StaticScreenGame {
 			}
 		}
 
-		car1Pos = car1.getPosition();
-		car2Pos = car2.getPosition();
+		//car1Pos = car1.getPosition();
+		//car2Pos = car2.getPosition();
 		checkUserInput ();
 		CollisionHandlers(deltaMs);
-		//music.loop(0.05, 25);
 
-		if (!gameIsRun) {
-			iniTime = System.currentTimeMillis();
-			gameIsRun = true;
-		}
 
 	}
 
@@ -843,6 +850,11 @@ public class Game extends StaticScreenGame {
 		speedUp = keyboard.isPressed(KeyEvent.VK_UP);
 		applybreak = keyboard.isPressed(KeyEvent.VK_DOWN);
 		standRevup = keyboard.isPressed(KeyEvent.VK_SPACE);
+		if (keyboard.isPressed(KeyEvent.VK_F1)) {
+			startGame = true;
+			displayMenu = false;
+			displayNextLevel = false;
+		}
 	}
 
 	public void CollisionHandlers(long deltaMs) {

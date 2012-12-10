@@ -156,11 +156,11 @@
      </frameset>
   
       <frameset>
-        <name>stone2</name>
-        <top>336</top>
-        <left>632</left>
-        <width>88</width>
-        <height>56</height>
+        <name>bg2</name>
+        <top>352</top>
+        <left>648</left>
+        <width>40</width>
+        <height>40</height>
      </frameset>
 
      <frameset>

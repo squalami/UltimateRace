@@ -44,6 +44,7 @@ public class RaceTrack extends VanillaAARectangle {
 	double cameraDepth = 1 / Math.tan((fieldOfView/2) * Math.PI/180);
 	double carZ  = cameraHeight * cameraDepth;
 	double carX;
+	double orgCarX;
 	double carY;
 	double centrifugal  = 0.3;             	
 	double maxSpeed = 5; 
@@ -57,7 +58,7 @@ public class RaceTrack extends VanillaAARectangle {
 
 	long time = 0;
 	long currentLapTime = 0;    
-	
+
 	int curIndex = 0;
 	int totalIndex = 0;
 	int updateDelay = 0;
@@ -65,7 +66,7 @@ public class RaceTrack extends VanillaAARectangle {
 	int medLoop = 77777;
 	int smallLoop = 777;
 	RoadSegment curSegment;
-	
+
 	int fireTimer = 450;
 	int fireTimerCount = 0;
 	boolean startFireTimer = false;
@@ -79,7 +80,7 @@ public class RaceTrack extends VanillaAARectangle {
 	ArrayList<PolyHolder> rumbles;
 	ArrayList<PolyHolder> road;
 	BodyLayer<OffroadObjects> offroadLayer;
-	
+
 	AudioClip crash;
 	AudioStream decel;
 	AudioStream full;
@@ -122,38 +123,22 @@ public class RaceTrack extends VanillaAARectangle {
 		curSegment = null;
 		updateTrack();		    
 	}
+	
+	public void resetRaceTrack() {
+		curZpos = 0;
+		carX = 0;
+		carY = 0;
+		track = new BuildTrack(carZ,car);
+		road.clear();
+		rumbles.clear();
+		grasses.clear();
+		curSegment = null;
+		updateTrack();
+	}
 
 	@Override
 	public void update(long deltaMs) {
-		if (car.speed < 0.7) 
-			dx = 0.005;
-		else
-			dx = 0.002 * (car.speed * 10);  
-		
-		double preCarX = carX;		
-		time++;
-		curIndex = Rd.curIndex;
-		
-		if (startFireTimer) {
-			fireTimerCount++;
-		}	
-		if (hitGrass) {
-			curMaxSpeed = 0.15;
-		} else {
-			curMaxSpeed = maxSpeed;
-		}
-		updateDelay = (int) (27 - (maxSpeed * car.speed * 10));
 
-		carPos = car.getPosition();
-		carZ  = cameraHeight * cameraDepth;
-
-		if (curIndex + 2 > totalIndex) {
-			curZpos = 0;
-			car.lap++;
-		}
-		
-		car.state = curSegment.state;
-		
 		if (Game.standRevup) {
 			car.setFire = true;
 			car.setSmoke = true;
@@ -166,134 +151,170 @@ public class RaceTrack extends VanillaAARectangle {
 		} else {
 			car.setFire = false;
 			car.setSmoke = false;
-			standRevup.pause();
+			pauseAllAudio();
+			if (idle.getState() == AudioState.PAUSED) 
+				idle.resume();
+			else if (idle.getState() != AudioState.PLAYING)
+				idle.loop(1,medLoop);
+			
 		}
-		
 
+		if (Game.gameIsRun) {
+			if (car.speed < 0.7) 
+				dx = 0.005;
+			else
+				dx = 0.002 * (car.speed * 10);  
 
-		if (Game.speedUp) {
+			double preCarX = carX;		
+			time++;
+			curIndex = Rd.curIndex;
+
 			if (startFireTimer) {
-				car.setFire = true;
-				if (full.getState() == AudioState.PLAYING) full.pause();
-				if (boostUp.getState() == AudioState.PAUSED ) {
-					boostUp.resume();
-				} else if (boostUp.getState() == AudioState.PRE
-			         || boostUp.getState() == AudioState.STOPPED){
-					boostUp.loop(1.5,medLoop);
-				}
-				if (car.speed < curMaxSpeed) car.speed += 0.002;
-				if (fireTimerCount >= fireTimer) {
-					fireTimerCount = 0;
-					startFireTimer = false;
-					car.setFire = false;
-					boostUp.pause();
-					startFireTimer = false;
-				}
+				fireTimerCount++;
+			}	
+			if (hitGrass) {
+				curMaxSpeed = 0.15;
+			} else {
+				curMaxSpeed = maxSpeed;
+			}
+			updateDelay = (int) (27 - (maxSpeed * car.speed * 10));
+
+			carPos = car.getPosition();
+			carZ  = cameraHeight * cameraDepth;
+
+			if (curIndex + 2 > totalIndex) {
+				curZpos = 0;
+				car.lap++;
 			}
 
-			else if (car.speed < curMaxSpeed) {
-				
-				if (car.speed < 1.3) {
-				    car.speed += 0.001;
-				} else if (car.speed >= 1.3 && car.speed < 2.5) {
-					car.speed += 0.0002;
-				} else if (car.speed >= 2.5) {
-					car.speed += 0.00005;
-				}
-				if (decel.getState() == AudioState.PLAYING) decel.pause();
-				if (car.speed > 0 && car.speed < 0.7) {
+			car.state = curSegment.state;
+
+
+
+			if (Game.speedUp) {
+				if (startFireTimer) {
 					car.setFire = true;
-					car.setSmoke = true;
-					if (car.offRoad) {
-						car.setSmoke = false;
-					}
 					if (full.getState() == AudioState.PLAYING) full.pause();
-					if (revup.getState() == AudioState.PAUSED ) {
-						revup.resume();
-					} else if (revup.getState() == AudioState.PRE
-				         || revup.getState() == AudioState.STOPPED){
-						revup.loop(1.5,medLoop);
+					if (boostUp.getState() == AudioState.PAUSED ) {
+						boostUp.resume();
+					} else if (boostUp.getState() == AudioState.PRE
+							|| boostUp.getState() == AudioState.STOPPED){
+						boostUp.loop(1.5,medLoop);
 					}
-				} else if (car.speed >= 0.7) {
-					car.setSmoke = false;
-					car.setFire = true;
-					revup.pause();
-					if (full.getState() == AudioState.PAUSED )
-						full.resume();
-					else
-					    full.loop(2,bigLoop);
-					
-					if (car.speed >= 1.3) {
+					if (car.speed < curMaxSpeed) car.speed += 0.002;
+					if (fireTimerCount >= fireTimer) {
+						fireTimerCount = 0;
+						startFireTimer = false;
 						car.setFire = false;
+						boostUp.pause();
+						startFireTimer = false;
 					}
 				}
+
+				else if (car.speed < curMaxSpeed) {
+
+					if (car.speed < 1.3) {
+						car.speed += 0.001;
+					} else if (car.speed >= 1.3 && car.speed < 2.5) {
+						car.speed += 0.0002;
+					} else if (car.speed >= 2.5) {
+						car.speed += 0.00005;
+					}
+					if (decel.getState() == AudioState.PLAYING) decel.pause();
+					if (car.speed > 0 && car.speed < 0.7) {
+						car.setFire = true;
+						car.setSmoke = true;
+						if (car.offRoad) {
+							car.setSmoke = false;
+						}
+						if (full.getState() == AudioState.PLAYING) full.pause();
+						if (revup.getState() == AudioState.PAUSED ) {
+							revup.resume();
+						} else if (revup.getState() == AudioState.PRE
+								|| revup.getState() == AudioState.STOPPED){
+							revup.loop(1.5,medLoop);
+						}
+					} else if (car.speed >= 0.7) {
+						car.setSmoke = false;
+						car.setFire = true;
+						revup.pause();
+						if (full.getState() == AudioState.PAUSED )
+							full.resume();
+						else
+							full.loop(2,bigLoop);
+
+						if (car.speed >= 1.3) {
+							car.setFire = false;
+						}
+					}
+				} else {
+					if (car.speed > 0.7) {
+						revup.pause();
+						if (full.getState() == AudioState.PAUSED )
+							full.resume();
+						else
+							full.loop(2,bigLoop);
+					} 
+				}
+
+			} else if (Game.applybreak) {
+				if (car.speed > 0) car.speed *= 0.1;
 			} else {
-				if (car.speed > 0.7) {
+
+				if (boostUp.getState() == AudioState.PLAYING) 
+					boostUp.pause();
+
+				car.speed *= 0.99;
+
+				if (car.speed > 0.05) {
+					full.pause();
 					revup.pause();
-					if (full.getState() == AudioState.PAUSED )
-						full.resume();
+					if (decel.getState() == AudioState.PAUSED ) 
+						decel.resume();
 					else
-						full.loop(2,bigLoop);
-				} 
-			}
-			
-		} else if (Game.applybreak) {
-			if (car.speed > 0) car.speed *= 0.1;
-		} else {
-			
-			if (boostUp.getState() == AudioState.PLAYING) 
-				boostUp.pause();
-			
-			car.speed *= 0.99;
-			
-			if (car.speed > 0.05) {
-				full.pause();
-				revup.pause();
-				if (decel.getState() == AudioState.PAUSED ) 
-					decel.resume();
-				else
-					decel.loop(0.6,smallLoop);
-			} else {
-				if (decel.getState() == AudioState.PLAYING )
-					decel.pause();
-				if (idle.getState() == AudioState.PAUSED ) 
-					idle.resume();
-			}
-			//else car.speed = 0;
-		}
-
-		if (Game.turnLeft) {
-			carX = carX - dx - (dx * car.speed * centrifugal);
-		} else if (Game.turnRight) {
-			carX = carX + dx + (dx * car.speed * centrifugal);
-		}
-
-		//carX = carX - (dx * car.speed * findSegment(carZ).x * centrifugal / maxSpeed);
-		//carY = carPos.getY();
-		//car.setCenterPosition(new Vector2D(carX,carY));
-
-		if (car.speed > 0 || preCarX != carX) {
-			curZpos = increase(curZpos, deltaMs * car.speed, trackLength);
-		}
-
-		if (time > updateDelay) {
-
-			//System.out.println("preZpos"+preZpos+", curZpos:"+curZpos);
-			if (carPos.getX() != carPrePos.getX() || curZpos != preZpos) {
-				road.clear();
-				rumbles.clear();
-				grasses.clear();
-				curSegment = null;
-				updateTrack();
-				preZpos = curZpos;
-				Game.runUpdate = true;
+						decel.loop(0.6,smallLoop);
+				} else {
+					if (decel.getState() == AudioState.PLAYING )
+						decel.pause();
+					if (idle.getState() == AudioState.PAUSED ) 
+						idle.resume();
+				}
+				//else car.speed = 0;
 			}
 
-			time = 0;			
+			if (Game.turnLeft) {
+				carX = carX - dx - (dx * car.speed * centrifugal);
+			} else if (Game.turnRight) {
+				carX = carX + dx + (dx * car.speed * centrifugal);
+			}
 
+			//carX = carX - (dx * car.speed * findSegment(carZ).x * centrifugal / maxSpeed);
+			//carY = carPos.getY();
+			//car.setCenterPosition(new Vector2D(carX,carY));
+
+			if (car.speed > 0 || preCarX != carX) {
+				curZpos = increase(curZpos, deltaMs * car.speed, trackLength);
+			}
+
+			if (time > updateDelay) {
+
+				//System.out.println("preZpos"+preZpos+", curZpos:"+curZpos);
+				if (carPos.getX() != carPrePos.getX() || curZpos != preZpos) {
+					road.clear();
+					rumbles.clear();
+					grasses.clear();
+					curSegment = null;
+					updateTrack();
+					preZpos = curZpos;
+					Game.runUpdate = true;
+				}
+
+				time = 0;			
+
+			}
+
+			checkCollision();
 		}
-
-		checkCollision();
 	}
 
 	private void checkCollision() {
@@ -301,9 +322,9 @@ public class RaceTrack extends VanillaAARectangle {
 		double xL = carPos.getX();
 		double xR = xL + car.getWidth();
 		double cY = carPos.getY();
-		
+
 		// hit rumble strips
-		
+
 		if ((xL < curSegment.rumbleLeft && xR > curSegment.rumbleLeft - rumbleLength) || 
 				(xR > curSegment.rumbleRight && xL < curSegment.rumbleRight + rumbleLength)) {
 			//System.out.println("hit rumble");
@@ -316,7 +337,7 @@ public class RaceTrack extends VanillaAARectangle {
 					rsound.resume();
 				else
 					rsound.loop(5, smallLoop);
-				
+
 				if (cY == carPrePos.getY()) {
 					car.setPosition(new Vector2D(carPos.getX(),carPos.getY()-5));
 
@@ -343,7 +364,7 @@ public class RaceTrack extends VanillaAARectangle {
 					decel.resume();
 				else
 					decel.loop(1.5,medLoop);
-				
+
 			}
 		} else {
 			hitGrass = false;
@@ -357,15 +378,15 @@ public class RaceTrack extends VanillaAARectangle {
 					idle.loop(1,medLoop);
 				}
 			} else if (car.speed > 0) {
-                idle.pause();
-              
+				idle.pause();
+
 			}
 			if (cY < carPrePos.getY()) {
 				car.setPosition(new Vector2D(carPos.getX(),carPrePos.getY()));
 
 			}
 		}
-		
+
 		if (curSegment.curve && car.speed > 0.4) {
 			car.setSmoke = true;
 			if (skid.getState() == AudioState.PAUSED)
@@ -388,11 +409,11 @@ public class RaceTrack extends VanillaAARectangle {
 		}
 	}
 
- 	@Override
+	@Override
 	public void render(RenderingContext rc) {		
 		//super.render(rc);
 	}
-	
+
 	public double increase(double start, double increment, double max) {
 		double result = start + increment;
 		while (result > max) result -= increment;
@@ -574,6 +595,17 @@ public class RaceTrack extends VanillaAARectangle {
 		return track.segments.get((int) (Math.floor(z/segmentLength) % track.segments.size())); 
 	}
 
+	public void pauseAllAudio() {
+		if (decel.getState() == AudioState.PLAYING) decel.pause();
+		if (full.getState() == AudioState.PLAYING) full.pause();
+		if (idle.getState() == AudioState.PLAYING) idle.pause();
+		if (revup.getState() == AudioState.PLAYING) revup.pause();
+		if (rsound.getState() == AudioState.PLAYING) rsound.pause();
+		if (skid.getState() == AudioState.PLAYING) skid.pause();
+		if (standRevup.getState() == AudioState.PLAYING) standRevup.pause();
+		if (boostUp.getState() == AudioState.PLAYING) boostUp.pause();
+	}
+	
 	@Override
 	public boolean isActive() {
 		// TODO Auto-generated method stub
@@ -599,7 +631,7 @@ public class RaceTrack extends VanillaAARectangle {
 		else min2 = x4;
 		return (min1 < min2)? min1: min2;
 	}
-	
+
 	private double maxVal(double x1, double x2, double x3, double x4) {
 		double max1 = 0;
 		double max2 = 0;
