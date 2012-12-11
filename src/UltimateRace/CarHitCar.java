@@ -38,6 +38,12 @@ public class CarHitCar implements CollisionHandler {
 				cy1 = car1Box.getCenterY();
 				cx2 = car2Box.getCenterX();
 				cy2 = car2Box.getCenterY();
+				double xDif = Math.abs(cx1-cx2);
+				double yDif = Math.abs(cy1-cy2);
+				car1.crashXpos = xDif;
+				car1.crashYpos = yDif;
+				car2.crashXpos = xDif;
+				car2.crashYpos = yDif;
 				if (cx1 < cx2) {
 					if (cy1 == cy2) {
 						car1.crashDir = Car.CrashDir.LEFT;

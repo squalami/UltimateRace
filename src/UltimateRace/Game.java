@@ -124,23 +124,23 @@ public class Game extends StaticScreenGame {
 				SPRITE_SHEET + "#smoke",
 				SPRITE_SHEET + "#cutgrass");
 
-		car2 = new Car(SPRITE_SHEET + "#greenCar",
-				new Vector2D((3*WORLD_WIDTH/4 - 200),WORLD_HEIGHT-70),
-				SPRITE_SHEET + "#fire",
-				SPRITE_SHEET + "#smoke",
-				SPRITE_SHEET + "#cutgrass");
-
-		car3 = new Car(SPRITE_SHEET + "#orangeCar",
-				new Vector2D((3*WORLD_WIDTH/4 - 60),WORLD_HEIGHT-70),
-				SPRITE_SHEET + "#fire",
-				SPRITE_SHEET + "#smoke",
-				SPRITE_SHEET + "#cutgrass");
 
 		offroadLayer = new AbstractBodyLayer.IterativeUpdate<OffroadObjects>();
 		boostLayer = new AbstractBodyLayer.IterativeUpdate<SpeedBoost>();
 		oilLayer =  new AbstractBodyLayer.IterativeUpdate<Oil>();
 
 		if(isNet){
+			car2 = new Car(SPRITE_SHEET + "#greenCar",
+					new Vector2D((3*WORLD_WIDTH/4 - 200),WORLD_HEIGHT-70),
+					SPRITE_SHEET + "#fire",
+					SPRITE_SHEET + "#smoke",
+					SPRITE_SHEET + "#cutgrass");
+
+			car3 = new Car(SPRITE_SHEET + "#orangeCar",
+					new Vector2D((3*WORLD_WIDTH/4 - 60),WORLD_HEIGHT-70),
+					SPRITE_SHEET + "#fire",
+					SPRITE_SHEET + "#smoke",
+					SPRITE_SHEET + "#cutgrass");
 			//new multiplayer setup for more than 3 players
 			Scanner s2=new Scanner(System.in);
 			System.out.println("Host or client: ");
@@ -249,9 +249,10 @@ public class Game extends StaticScreenGame {
 		}
 
 		for (int i=90; i < raceTrack.totalIndex - 150; ) {
-			int rd =  (int) (Math.random() * 25)%3;
+			
+			int rd = 0;
 			if (BuildTrack.curChk.containsKey(i) && !BuildTrack.curChk.get(i)) {
-				boost = new SpeedBoost(SPRITE_SHEET + "#boost", raceTrack,i,rd);
+				boost = new SpeedBoost(SPRITE_SHEET + "#boost", raceTrack,i,(rd++)%3);
 				boostLayer.add(boost);
 				i += 350;
 			} else {
@@ -260,9 +261,9 @@ public class Game extends StaticScreenGame {
 		}
 
 		for (int i=125; i < raceTrack.totalIndex - 150; ) {
-			int rd =  (int) (Math.random() * 25) % 5;
+			int rd = 0;
 			if (BuildTrack.curChk.containsKey(i) && !BuildTrack.curChk.get(i)) {
-				sleekOil = new Oil(SPRITE_SHEET + "#oil", raceTrack,i,rd);
+				sleekOil = new Oil(SPRITE_SHEET + "#oil", raceTrack,i,(rd++)%5);
 				oilLayer.add(sleekOil);
 				i += 180;
 			} else {
@@ -442,8 +443,8 @@ public class Game extends StaticScreenGame {
 		super.update(deltaMs);
 
 		if (finishCurLevel) {
-			finishCurLevel = false;
 			resetGame();
+			finishCurLevel = false;
 			displayNextLevel = true;
 		}
 		//new mulitplayer stuff
@@ -897,6 +898,7 @@ public class Game extends StaticScreenGame {
 
 	public static void main(String[] args) {
 		//jig.engine.lwjgl.LWResourceFactory.makeCurrentResourceFactory();
+		
 
 		ResourceFactory.getJIGLogger().setLevel(Level.WARNING);
 		ResourceFactory.getJIGLogger().getHandlers()[0].setLevel(Level.WARNING);

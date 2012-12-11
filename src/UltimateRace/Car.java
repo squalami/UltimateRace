@@ -55,6 +55,8 @@ public class Car extends VanillaAARectangle {
 	double scal2H;
 	double xPos;
 	double yPos;
+	double crashXpos = 0;
+	double crashYpos = 0;
 	public State state = State.STRAIGHT;
 	
 	List<ImageResource> Fire;
@@ -90,10 +92,11 @@ public class Car extends VanillaAARectangle {
 				Game.finishCurLevel = true;
 			}
 		}
-		if (Game.finishCurLevel) {
+		if (Game.finishCurLevel || Game.displayNextLevel) {
 			lap = 1;
 			RacePos = 1;
 			elapsedTime = 0;
+			speed = 0;
 		}
 		if (Game.startGame) {
 			isWin = false;

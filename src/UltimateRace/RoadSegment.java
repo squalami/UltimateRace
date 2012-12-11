@@ -15,6 +15,7 @@ public class RoadSegment implements Comparable<RoadSegment>, java.io.Serializabl
 	long time;
 	
 	double x;       // curve
+	double hill;
 	double roadCenter; // center x value for road segment bottom edge
 	double rumbleLeft;
 	double rumbleRight;
@@ -40,7 +41,11 @@ public class RoadSegment implements Comparable<RoadSegment>, java.io.Serializabl
 	Car.State state;;
 	
 	
-	public RoadSegment(Car.State s, boolean c) { state = s; curve = c; }
+	public RoadSegment(Car.State s, boolean c, double hv) { 
+		state = s; 
+		curve = c; 
+		hill = hv;
+	}
 	
 	public int compareTo(RoadSegment other) {
 		return Double.compare(index,other.index);

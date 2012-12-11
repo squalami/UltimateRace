@@ -100,7 +100,7 @@ public class BuildTrack {
 		for (int i=0; i < eIn; i++) {
 			if (x != 0) curChk.put(index,true);
 			else curChk.put(index, false);
-			s = new RoadSegment(state,isCurve);
+			s = new RoadSegment(state,isCurve,y);
 			s.lowerY = previousY();
 			s.upperY = easeOut(sY,eY,(double)i/total);
 			s.x = easeIn(0,x,(double)i/eIn);
@@ -119,7 +119,7 @@ public class BuildTrack {
 		for (int i=0; i < runLength; i++) {
 			if (x != 0) curChk.put(index,true);
 			else curChk.put(index, false);
-			s = new RoadSegment(state,isCurve);
+			s = new RoadSegment(state,isCurve,y);
 			s.lowerY = previousY();
 			s.upperY = easeOut(sY,eY,((double)i+eIn)/total);
 			s.x = x;
@@ -135,7 +135,7 @@ public class BuildTrack {
 		for (int i=0; i < eOut; i++) {
 			if (x != 0) curChk.put(index,true);
 			else curChk.put(index, false);
-			s = new RoadSegment(state,isCurve);
+			s = new RoadSegment(state,isCurve,y);
 			s.lowerY = previousY();
 			s.upperY = easeOut(sY,eY,((double)i+eIn+runLength)/total);
 			s.x = easeOut(x,0,(double)i/eOut);

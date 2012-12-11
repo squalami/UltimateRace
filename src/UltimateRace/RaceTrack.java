@@ -162,6 +162,8 @@ public class RaceTrack extends VanillaAARectangle {
 		}
 
 		if (Game.gameIsRun) {
+			double hillFactor = 0;
+			if (car.speed > 0.1) hillFactor = curSegment.hill / 100;
 			if (car.speed < 0.7) 
 				dx = 0.005;
 			else
@@ -216,11 +218,11 @@ public class RaceTrack extends VanillaAARectangle {
 				else if (car.speed < curMaxSpeed) {
 
 					if (car.speed < 1.3) {
-						car.speed += 0.001;
+						car.speed = car.speed + 0.001 - (0.002 * hillFactor);
 					} else if (car.speed >= 1.3 && car.speed < 2.5) {
-						car.speed += 0.0002;
+						car.speed = car.speed + 0.0002 - (0.003 * hillFactor);
 					} else if (car.speed >= 2.5) {
-						car.speed += 0.00005;
+						car.speed = car.speed + 0.00005 - (0.00005 * hillFactor);
 					}
 					if (decel.getState() == AudioState.PLAYING) decel.pause();
 					if (car.speed > 0 && car.speed < 0.7) {
@@ -429,6 +431,35 @@ public class RaceTrack extends VanillaAARectangle {
 				skid.resume();
 			car.setSmoke = true;
 			skidOffright = false;
+		}
+		
+		if (car.carCrash && car.crashDir != null) {
+			double hypoDis = 2 * carZ * Math.sqrt(car.crashXpos * car.crashXpos+car.crashYpos*car.crashYpos);
+			double dX = 25 * dx * car.speed;
+			if (car.crashDir == Car.CrashDir.DOWN) {
+				curZpos = curZpos - (2*carZ * car.speed);
+			} else if (car.crashDir == Car.CrashDir.DOWNLEFT) {
+				curZpos = curZpos - hypoDis;
+				carX = carX - dX;
+			} else if (car.crashDir == Car.CrashDir.DOWNRIGHT) {
+				curZpos = curZpos + hypoDis;
+				carX = carX + dX;
+			} else if (car.crashDir == Car.CrashDir.UP) {
+				curZpos = curZpos + (2*carZ * car.speed);
+			} else if (car.crashDir == Car.CrashDir.UPLEFT) {
+				curZpos = curZpos + hypoDis;
+				carX = carX - dX;				
+			} else if (car.crashDir == Car.CrashDir.UPRIGHT) {
+				curZpos = curZpos + hypoDis;
+				carX = carX + dX;
+			} else if (car.crashDir == Car.CrashDir.RIGHT) {
+				carX += dX;
+			} else if (car.crashDir == Car.CrashDir.LEFT) {
+				carX -= dX;
+			}						
+			car.speed = 0;
+			car.crashDir = null;
+			car.carCrash = false;
 		}
 	}
 
