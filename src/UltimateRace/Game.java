@@ -626,6 +626,12 @@ public class Game extends StaticScreenGame {
 					other1Data=np2[0];
 				}
 				int currCarIndex=np1[0].p1.index;
+                                if(other1Data.carN==-1){
+                                    startGame = true;
+                                    displayMenu = false;
+                                    displayNextLevel = false;
+                                }
+                                else{
 				for(int i=0;i<RaceTrack.drawDistance;i++){
 					if(other1Data.p1.index==currCarIndex){
 						otherCar1.setActivation(true);
@@ -684,6 +690,7 @@ public class Game extends StaticScreenGame {
 				else{
 					doPos(car1,car2,car1.curSegment,np1[0].p1);
 				}
+                                }
 			}
 		}
 
@@ -691,8 +698,7 @@ public class Game extends StaticScreenGame {
 		//car2Pos = car2.getPosition();
 		checkUserInput ();
 		CollisionHandlers(deltaMs);
-
-
+               
 	}
 
 	//3 car base race postioning finding, will try to far car farthest ahead then use 2 car for other 2
@@ -897,13 +903,30 @@ public class Game extends StaticScreenGame {
 		speedUp = keyboard.isPressed(KeyEvent.VK_UP);
 		applybreak = keyboard.isPressed(KeyEvent.VK_DOWN);
 		standRevup = keyboard.isPressed(KeyEvent.VK_SPACE);
-		if (keyboard.isPressed(KeyEvent.VK_F1)) {
-			startGame = true;
-			displayMenu = false;
-			displayNextLevel = false;
-		}
-	}
-
+                    if(isNet){
+                        if(isServ){
+                             if (keyboard.isPressed(KeyEvent.VK_F1)) {
+                            startGame = true;
+                            displayMenu = false;
+                            displayNextLevel = false;
+                            carS p1=new carS();
+                            p1.carN=-1;
+                            GameNet.sendData2(p1,0);
+                            if(NumberOfC>1){
+                                GameNet.sendData2(p1,1);
+                            }
+                            }
+                        }
+                    }
+                    else{
+                        if (keyboard.isPressed(KeyEvent.VK_F1)) {
+                            startGame = true;
+                            displayMenu = false;
+                            displayNextLevel = false;
+                        }
+                    }
+         }
+                
 	public void CollisionHandlers(long deltaMs) {
 		checkCollisions.registerCollisionHandler(hitOil);
 		checkCollisions.registerCollisionHandler(hitSpeedBoost);

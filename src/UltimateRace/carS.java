@@ -24,6 +24,7 @@ class carS implements java.io.Serializable{
         //socket message stuff for 3 computers
         int carNum;
         int carN;
+        boolean startGame;
         /**
 	 * 
 	 */
