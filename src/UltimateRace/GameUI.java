@@ -103,20 +103,22 @@ public class GameUI implements ViewableLayer {
 			whiteFont.render("1. Arrow keys: to control the car.",rc, AffineTransform.getTranslateInstance(X,4*30));
 			whiteFont.render("2. Space-Bar: check out car engine performance.",rc, AffineTransform.getTranslateInstance(X,5*30));			
 			whiteFont.render("3. Press F1 to start.",rc, AffineTransform.getTranslateInstance(X,6*30));
-			whiteBig.render("A Game by:",rc, AffineTransform.getTranslateInstance(X+80,7*30));
+			whiteBig.render("Ultimate Car Race by:",rc, AffineTransform.getTranslateInstance(X+60,7*30));
 			whiteBig.render("Fred Doan - Brian Lamb - Perry Miller",rc, AffineTransform.getTranslateInstance(X,8*30));
 			whiteBig.render("WSU - Fall 2012.",rc, AffineTransform.getTranslateInstance(X+90,9*30));
 		}
 
 		int speed = (int)(car.speed * 45);
-		redFont.render("Position:  "+car.RacePos, rc, 
+		redFont.render("Level:  "+Game.level, rc, 
 				AffineTransform.getTranslateInstance(10,20));
+		redFont.render("Position:  "+car.RacePos, rc, 
+				AffineTransform.getTranslateInstance(90,20));
 		redFont.render("Lap:  "+car.lap, rc, 
-				AffineTransform.getTranslateInstance(150,20));
+				AffineTransform.getTranslateInstance(210,20));
 		redFont.render("Time Elapsed (s):  "+car.elapsedTime, rc, 
-				AffineTransform.getTranslateInstance(250,20));
+				AffineTransform.getTranslateInstance(290,20));
 		redFont.render("Speed(mph):  "+speed, rc, 
-				AffineTransform.getTranslateInstance(470,20));
+				AffineTransform.getTranslateInstance(490,20));
 		
 		
 	}

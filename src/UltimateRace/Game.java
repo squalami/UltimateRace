@@ -129,18 +129,18 @@ public class Game extends StaticScreenGame {
 		boostLayer = new AbstractBodyLayer.IterativeUpdate<SpeedBoost>();
 		oilLayer =  new AbstractBodyLayer.IterativeUpdate<Oil>();
 
-                System.out.println("Enter 1 for single player demo mode");
-                System.out.println("Or enter 2 for mulitplayer mode");
-                System.out.println("->");
-                Scanner s3=new Scanner(System.in);
-                int GameChoice=s3.nextInt();
-                if(GameChoice==1){
-                    isNet=false;
-                }
-                else{
-                    isNet=true;
-                }
-                
+		System.out.println("");
+		System.out.println("Enter 1 for single player demo mode or enter 2 for mulitplayer mode");
+		System.out.print("->");
+		Scanner s3=new Scanner(System.in);
+		int GameChoice=s3.nextInt();
+		if(GameChoice==1){
+			isNet=false;
+		}
+		else{
+			isNet=true;
+		}
+
 		if(isNet){
 			car2 = new Car(SPRITE_SHEET + "#greenCar",
 					new Vector2D((3*WORLD_WIDTH/4 - 200),WORLD_HEIGHT-70),
@@ -248,7 +248,7 @@ public class Game extends StaticScreenGame {
 		car1Layer.add(car1);	
 		gameObjectLayers.add(car1Layer);
 		physics.manageViewableSet(car1Layer);
-		
+
 		if (isNet) {
 			car2Layer = new AbstractBodyLayer.IterativeUpdate<Car>();
 			car2Layer.add(car2);
@@ -261,23 +261,22 @@ public class Game extends StaticScreenGame {
 		}
 
 		for (int i=90; i < raceTrack.totalIndex - 150; ) {
-			
 			int rd = 0;
 			if (BuildTrack.curChk.containsKey(i) && !BuildTrack.curChk.get(i)) {
 				boost = new SpeedBoost(SPRITE_SHEET + "#boost", raceTrack,i,(rd++)%3);
 				boostLayer.add(boost);
-				i += 350;
+				i += 250;
 			} else {
 				i++;
 			}			
 		}
 
-		for (int i=125; i < raceTrack.totalIndex - 150; ) {
+		for (int i=170; i < raceTrack.totalIndex - 150; ) {
 			int rd = 0;
 			if (BuildTrack.curChk.containsKey(i) && !BuildTrack.curChk.get(i)) {
 				sleekOil = new Oil(SPRITE_SHEET + "#oil", raceTrack,i,(rd++)%5);
 				oilLayer.add(sleekOil);
-				i += 180;
+				i += 200;
 			} else {
 				i++;
 			}			
@@ -462,8 +461,8 @@ public class Game extends StaticScreenGame {
 		//new mulitplayer stuff
 		carS np1[]=new carS[2];
 		carS np2[]=new carS[2];
-                RoadSegment segOrg = new RoadSegment(State.STRAIGHT,false,0);
-                
+		RoadSegment segOrg = new RoadSegment(State.STRAIGHT,false,0);
+
 		//normal 2 player stuff
 		/*
 		carS p1;
@@ -474,7 +473,7 @@ public class Game extends StaticScreenGame {
 		double car1Dist;
 		double car2Dist; 
 		double calcX;
-		
+
 		//*/
 		if(isNet){
 			if(isServ){
@@ -528,16 +527,16 @@ public class Game extends StaticScreenGame {
 					if(car2Data.p1.index==currCarIndex){
 						car2.setActivation(true);
 						carsFound++;
-                                                segOrg=raceTrack.track.segments.get(currCarIndex);
-                                                car2.scal2H=(segOrg.grassRight-segOrg.grassLeft)/(np2[0].p1.grassRight-np2[0].p1.grassLeft);
+						segOrg=raceTrack.track.segments.get(currCarIndex);
+						car2.scal2H=(segOrg.grassRight-segOrg.grassLeft)/(np2[0].p1.grassRight-np2[0].p1.grassLeft);
 						//do ofther car2 stuff
 					}
 					if(NumberOfC>1){
 						if(car3Data.p1.index==currCarIndex){
 							car3.setActivation(true);
 							carsFound++;
-                                                        segOrg=raceTrack.track.segments.get(currCarIndex);
-                                                        car3.scal2H=(segOrg.grassRight-segOrg.grassLeft)/(np2[0].p1.grassRight-np2[0].p1.grassLeft);
+							segOrg=raceTrack.track.segments.get(currCarIndex);
+							car3.scal2H=(segOrg.grassRight-segOrg.grassLeft)/(np2[0].p1.grassRight-np2[0].p1.grassLeft);
 							//do other car 3 stuff
 						}
 					}
@@ -636,16 +635,16 @@ public class Game extends StaticScreenGame {
 					if(other1Data.p1.index==currCarIndex){
 						otherCar1.setActivation(true);
 						carsFound++;
-                                                segOrg=raceTrack.track.segments.get(currCarIndex);
-                                                otherCar1.scal2H=(segOrg.grassRight-segOrg.grassLeft)/(np1[0].p1.grassRight-np1[0].p1.grassLeft);
+						segOrg=raceTrack.track.segments.get(currCarIndex);
+						otherCar1.scal2H=(segOrg.grassRight-segOrg.grassLeft)/(np1[0].p1.grassRight-np1[0].p1.grassLeft);
 						//do ofther car2 stuff
 					}
 					if(NumberOfC>1){
 						if(other2Data.p1.index==currCarIndex){
 							otherCar2.setActivation(true);
 							carsFound++;
-                                                        segOrg=raceTrack.track.segments.get(currCarIndex);
-                                                        otherCar2.scal2H=(segOrg.grassRight-segOrg.grassLeft)/(np1[0].p1.grassRight-np1[0].p1.grassLeft);
+							segOrg=raceTrack.track.segments.get(currCarIndex);
+							otherCar2.scal2H=(segOrg.grassRight-segOrg.grassLeft)/(np1[0].p1.grassRight-np1[0].p1.grassLeft);
 							//do other car 3 stuff
 						}
 					}
@@ -942,7 +941,7 @@ public class Game extends StaticScreenGame {
 
 	public static void main(String[] args) {
 		//jig.engine.lwjgl.LWResourceFactory.makeCurrentResourceFactory();
-		
+
 
 		ResourceFactory.getJIGLogger().setLevel(Level.WARNING);
 		ResourceFactory.getJIGLogger().getHandlers()[0].setLevel(Level.WARNING);

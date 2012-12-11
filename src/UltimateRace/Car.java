@@ -93,13 +93,13 @@ public class Car extends VanillaAARectangle {
 			}
 		}
 		if (Game.finishCurLevel || Game.displayNextLevel) {
-			lap = 1;
-			RacePos = 1;
-			elapsedTime = 0;
 			speed = 0;
 		}
 		if (Game.startGame) {
-			isWin = false;
+			lap = 1;
+			RacePos = 1;
+			elapsedTime = 0;
+        	isWin = false;
 		}
 	}
 
