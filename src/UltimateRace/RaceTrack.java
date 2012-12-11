@@ -153,7 +153,8 @@ public class RaceTrack extends VanillaAARectangle {
 		} else {
 			car.setFire = false;
 			car.setSmoke = false;
-			pauseAllAudio();
+			if (!Game.gameIsRun) pauseAllAudio();
+			//if (standRevup.getState() == AudioState.PLAYING)  standRevup.pause();
 			if (idle.getState() == AudioState.PAUSED) 
 				idle.resume();
 			else if (idle.getState() != AudioState.PLAYING)
@@ -163,7 +164,7 @@ public class RaceTrack extends VanillaAARectangle {
 
 		if (Game.gameIsRun) {
 			double hillFactor = 0;
-			if (car.speed > 0.1) hillFactor = curSegment.hill / 100;
+			if (car.speed > 0.7) hillFactor = curSegment.hill / 100 ;
 			if (car.speed < 0.7) 
 				dx = 0.005;
 			else
@@ -188,11 +189,11 @@ public class RaceTrack extends VanillaAARectangle {
 
 			if (curIndex + 2 > totalIndex) {
 				curZpos = 0;
+				carX = 0;
 				car.lap++;
 			}
 
 			car.state = curSegment.state;
-
 
 
 			if (Game.speedUp) {
@@ -218,9 +219,9 @@ public class RaceTrack extends VanillaAARectangle {
 				else if (car.speed < curMaxSpeed) {
 
 					if (car.speed < 1.3) {
-						car.speed = car.speed + 0.001 - (0.002 * hillFactor);
+						car.speed = car.speed + 0.001 - (0.0007 * hillFactor);
 					} else if (car.speed >= 1.3 && car.speed < 2.5) {
-						car.speed = car.speed + 0.0002 - (0.003 * hillFactor);
+						car.speed = car.speed + 0.0002 - (0.0005 * hillFactor);
 					} else if (car.speed >= 2.5) {
 						car.speed = car.speed + 0.00005 - (0.00005 * hillFactor);
 					}
@@ -262,7 +263,7 @@ public class RaceTrack extends VanillaAARectangle {
 				}
 
 			} else if (Game.applybreak) {
-				if (car.speed > 0) car.speed *= 0.1;
+				if (car.speed > 0) car.speed *= 0.7;
 			} else {
 
 				if (boostUp.getState() == AudioState.PLAYING) 
