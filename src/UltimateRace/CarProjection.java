@@ -1,11 +1,5 @@
 package UltimateRace;
 
-/**
- * UltimateRace: Car Object 
- * F. Doan
- * 
- */
-
 import java.awt.geom.AffineTransform;
 import java.util.List;
 
@@ -15,8 +9,7 @@ import jig.engine.ResourceFactory;
 import jig.engine.physics.vpe.VanillaAARectangle;
 import jig.engine.util.Vector2D;
 
-
-public class Car extends VanillaAARectangle {
+public class CarProjection extends VanillaAARectangle {
 
 	public enum State { STRAIGHT, UP, DOWN }
 	public static enum CrashDir { UP, UPLEFT, UPRIGHT, DOWN, DOWNLEFT, DOWNRIGHT, LEFT, RIGHT }
@@ -63,7 +56,7 @@ public class Car extends VanillaAARectangle {
 	List<ImageResource> Smoke;
 	List<ImageResource> cGrass;
 
-	public Car(String sprite, Vector2D pos, String fire, String smoke, String cutGrass) {
+	public CarProjection(String sprite, Vector2D pos, String fire, String smoke, String cutGrass) {
 		super(sprite);
 		// TODO Auto-generated constructor stub
 		position = pos;
@@ -84,23 +77,6 @@ public class Car extends VanillaAARectangle {
 	@Override
 	public void update(long deltaMs) {
 		updateFrames(deltaMs);
-		if (Game.gameIsRun) {
-			elapsedTime = (System.currentTimeMillis() - Game.iniTime)/1000;
-			if (lap > Game.lap2Win && RacePos == 1) {
-				isWin = true;
-				Game.gameIsRun = false;
-				Game.finishCurLevel = true;
-			}
-		}
-		if (Game.finishCurLevel || Game.displayNextLevel) {
-			speed = 0;
-		}
-		if (Game.startGame) {
-			lap = 1;
-			RacePos = 1;
-			elapsedTime = 0;
-        	isWin = false;
-		}
 	}
 
 	public void render(final RenderingContext rc) {

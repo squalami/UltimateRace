@@ -153,8 +153,8 @@ public class RaceTrack extends VanillaAARectangle {
 		} else {
 			car.setFire = false;
 			car.setSmoke = false;
-			if (!Game.gameIsRun) pauseAllAudio();
-			//if (standRevup.getState() == AudioState.PLAYING)  standRevup.pause();
+			//if (!Game.gameIsRun) pauseAllAudio();
+			if (standRevup.getState() == AudioState.PLAYING)  standRevup.pause();
 			if (idle.getState() == AudioState.PAUSED) 
 				idle.resume();
 			else if (idle.getState() != AudioState.PLAYING)
@@ -163,6 +163,7 @@ public class RaceTrack extends VanillaAARectangle {
 		}
 
 		if (Game.gameIsRun) {
+			if (standRevup.getState() == AudioState.PLAYING)  standRevup.pause();
 			double hillFactor = 0;
 			if (car.speed > 0.7) hillFactor = curSegment.hill / 100 ;
 			if (car.speed < 0.7) 
@@ -435,24 +436,24 @@ public class RaceTrack extends VanillaAARectangle {
 		}
 		
 		if (car.carCrash && car.crashDir != null) {
-			double hypoDis = 2 * carZ * Math.sqrt(car.crashXpos * car.crashXpos+car.crashYpos*car.crashYpos);
-			double dX = 25 * dx * car.speed;
+			//double hypoDis = carZ * Math.sqrt(car.crashXpos * car.crashXpos+car.crashYpos*car.crashYpos);
+			double dX = 15 * dx * car.speed;
 			if (car.crashDir == Car.CrashDir.DOWN) {
-				curZpos = curZpos - (2*carZ * car.speed);
+				curZpos *= 0.999;
 			} else if (car.crashDir == Car.CrashDir.DOWNLEFT) {
-				curZpos = curZpos - hypoDis;
-				carX = carX - dX;
+				curZpos *= 0.999;;
+				carX -= dX;
 			} else if (car.crashDir == Car.CrashDir.DOWNRIGHT) {
-				curZpos = curZpos + hypoDis;
-				carX = carX + dX;
+				curZpos *= 1.001;
+				carX += dX;
 			} else if (car.crashDir == Car.CrashDir.UP) {
-				curZpos = curZpos + (2*carZ * car.speed);
+				curZpos *= 0.999;
 			} else if (car.crashDir == Car.CrashDir.UPLEFT) {
-				curZpos = curZpos + hypoDis;
+				curZpos *= 1.001;
 				carX = carX - dX;				
 			} else if (car.crashDir == Car.CrashDir.UPRIGHT) {
-				curZpos = curZpos + hypoDis;
-				carX = carX + dX;
+				curZpos *= 1.001;
+				carX += dX;
 			} else if (car.crashDir == Car.CrashDir.RIGHT) {
 				carX += dX;
 			} else if (car.crashDir == Car.CrashDir.LEFT) {
@@ -543,7 +544,6 @@ public class RaceTrack extends VanillaAARectangle {
 		double r2 = rumbleWidth(w2, lanes);
 		double l1 = laneMarkerWidth(w1, lanes);
 		double l2 = laneMarkerWidth(w2, lanes);
-		segment.roadCenter = ((x2+w2)-(x1-w1))/2;
 		segment.grassLeft = x2-w2-r2;
 		segment.grassRight = x2+w2+r2;
 		segment.rumbleLeft = x2-w2;
@@ -566,8 +566,8 @@ public class RaceTrack extends VanillaAARectangle {
 		}
 
 		// left & right grass fields
-		addPolygon(index, segment.index, PolyHolder.Type.GRASS, grassColor, 0, y1, 0, y2, (x2-w2-r2),y2, (x1-w1-r1),y1);
-		addPolygon(index, segment.index, PolyHolder.Type.GRASS, grassColor, worldWidth, y1, worldWidth, y2, (x2+w2+r2), y2, (x1+w1+r1),y1);
+		addPolygon(index, segment.index, PolyHolder.Type.GRASS, grassColor, 0, y1, 0, y2, (x2-w2-r2),y2, (x1-w1-r1),y1,segment);
+		addPolygon(index, segment.index, PolyHolder.Type.GRASS, grassColor, worldWidth, y1, worldWidth, y2, (x2+w2+r2), y2, (x1+w1+r1),y1,segment);
 
 		if (segment.index == 12 || segment.index == 14) {
 			roadColor = Color.white;  // start line
@@ -575,11 +575,11 @@ public class RaceTrack extends VanillaAARectangle {
 			roadColor = Color.red;    // finish line
 		}
 		// left & right rumble lanes	
-		addPolygon(index, segment.index, PolyHolder.Type.RUMBLE, rumbleColor, x1-w1-r1, y1, x1-w1, y1, x2-w2, y2, x2-w2-r2, y2);
-		addPolygon(index, segment.index, PolyHolder.Type.RUMBLE, rumbleColor, x1+w1+r1, y1, x1+w1, y1, x2+w2, y2, x2+w2+r2, y2);
+		addPolygon(index, segment.index, PolyHolder.Type.RUMBLE, rumbleColor, x1-w1-r1, y1, x1-w1, y1, x2-w2, y2, x2-w2-r2, y2,segment);
+		addPolygon(index, segment.index, PolyHolder.Type.RUMBLE, rumbleColor, x1+w1+r1, y1, x1+w1, y1, x2+w2, y2, x2+w2+r2, y2,segment);
 
 		// the road
-		addPolygon(index, segment.index, PolyHolder.Type.ROAD, roadColor, x1-w1, y1, x1+w1, y1, x2+w2, y2, x2-w2, y2);
+		addPolygon(index, segment.index, PolyHolder.Type.ROAD, roadColor, x1-w1, y1, x1+w1, y1, x2+w2, y2, x2-w2, y2,segment);
 
 
 		if (drawSeparator) {  
@@ -588,14 +588,14 @@ public class RaceTrack extends VanillaAARectangle {
 			double lanex1 = x1 - w1 + lanew1; 
 			double lanex2 = x2 - w2 + lanew2; 
 			for(int lane = 1 ; lane < lanes ; lanex1 += lanew1, lanex2 += lanew2, lane++) {
-				addPolygon(index, segment.index, PolyHolder.Type.SEPARATOR, rumbleColor, lanex1 - l1/2, y1, lanex1 + l1/2, y1, lanex2 + l2/2, y2, lanex2 - l2/2, y2);
+				addPolygon(index, segment.index, PolyHolder.Type.SEPARATOR, rumbleColor, lanex1 - l1/2, y1, lanex1 + l1/2, y1, lanex2 + l2/2, y2, lanex2 - l2/2, y2,segment);
 			}
 		}
 
 	}
 
 	public void addPolygon(int i, int si, PolyHolder.Type t, Color c, double x1, double y1,
-			double x2, double y2, double x3, double y3, double x4, double y4) {
+			double x2, double y2, double x3, double y3, double x4, double y4, RoadSegment segment) {
 		PolyHolder ph = new PolyHolder();
 		ph.points = new ArrayList<Vector2D>();
 		ph.points.add(new Vector2D(x1,y1));
@@ -611,9 +611,15 @@ public class RaceTrack extends VanillaAARectangle {
 		ph.yT = y2;
 		ph.yB = y1;
 		ph.w = ph.xR - ph.xL;
+		double roadY = minVal(y1,y2,y3,y4);
 		//System.out.println(" adding polygon type:"+t);
 		if (t == PolyHolder.Type.ROAD) {
 			road.add(ph);
+			segment.roadCenter = ph.w/2 + ph.xL;
+			segment.roadUpLeft = ph.xL;
+			segment.roadUpRight = ph.xR;
+			segment.roadWidth = ph.w;
+			segment.roadY = roadY;
 		} else if (t == PolyHolder.Type.GRASS) {
 			grasses.add(ph);
 		} else if (t == PolyHolder.Type.SEPARATOR || t == PolyHolder.Type.RUMBLE) {

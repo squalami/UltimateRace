@@ -21,6 +21,11 @@ public class RoadSegment implements Comparable<RoadSegment>, java.io.Serializabl
 	double rumbleRight;
 	double grassLeft;
 	double grassRight;
+	double roadUpLeft;
+	double roadUpRight;
+	double roadWidth;
+	
+	double roadY;
 	
 	double lowerY;  // world bottom y
 	double upperY;  // world upper y

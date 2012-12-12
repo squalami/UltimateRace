@@ -27,7 +27,7 @@ public class CarHitSpeedBoost implements CollisionHandler {
 			if (booster.isActive()) {
 				Rectangle2D sbRec = booster.getBoundingBox();
 				Rectangle2D carRec = car.getBoundingBox();
-				if (carRec.contains(sbRec.getCenterX(),sbRec.getCenterY())) {
+				if (carRec.intersects(sbRec)) {
 					raceTrack.startFireTimer = true;
 				}
 			}
